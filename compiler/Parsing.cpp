@@ -4,6 +4,8 @@
 #include <string_view>
 #include <sstream>
 #include <array>
+#include <iostream>
+#include <regex>
 
 namespace {
 	static const std::array<mlc::CommandType, 11> COMMAND_LIST({
@@ -28,32 +30,44 @@ bool mlc::verify_command(const mlc::Command& command) noexcept {
 	return false;
 }
 
-mlc::Command mlc::extract_command(const std::string_view line)
+bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 {
 	std::istringstream linestream{ std::string(line) };
 
+	line = std::regex_replace(line, std::regex("^ +| +$|( ) +|(\\)) \\)"), "$1");
+
 	auto commandArgsStart = line.find_first_of('(');
+	if (commandArgsStart == std::string::npos) return false;
+
 	std::string cmnd{line.substr(0, commandArgsStart)};
 
 	std::vector<std::string> args; args.reserve(8);
 
 	std::string argstr;
-	for (std::size_t i = commandArgsStart + 1; i < line.size(); ++i) {
-		auto c = line[i];
-		if (c != ' ') {
+	std::size_t i;
+	for (i = commandArgsStart + 1; i < line.size(); ++i) {
+		if (line[i] == ')' || line[i] == '(') { return false; }
+		if (line[i] != ' ') {
 			auto endArg = line.find_first_of(',', i);
 
 			if (endArg == std::string::npos) {
-				auto s = line.substr(i, line.size() - i - 1);
-				args.emplace_back(s); break;
+				args.emplace_back(line.substr(i, line.find_first_of(" )", i) - i));
+				break;
 			} else {
 				args.emplace_back(line.substr(i, endArg - i));
 			}
-
 			i = endArg;
 		}
 	}
 
-	return mlc::Command(cmnd, args);
+	auto commandEnd = line.find_first_of(')', i);
+	if (commandEnd == std::string::npos) return false;
+
+	for (std::size_t j = commandEnd + 1; j < line.size(); ++j) {
+		if (line[j] != ' ') return false;
+	}
+
+	outcommand = mlc::Command(cmnd, args);
+	return true;
 }
 
