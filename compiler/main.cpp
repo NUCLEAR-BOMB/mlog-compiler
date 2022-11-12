@@ -11,18 +11,33 @@ int main(int argc, char *argv[])
 
 	std::cout << "Opening file\n";
 
-	std::string file = "t.txt";
+	std::string filepath = "t.txt";
+	std::string outfilepath = "tout.txt";
 
-	std::fstream infile(file, std::fstream::in);
+	std::fstream infile(filepath, std::fstream::in);
+	std::fstream outfile(outfilepath, std::fstream::trunc | std::fstream::out);
+
 	if (!infile.is_open()) return 1;
 
-	std::cout << "Reading\n";
+	std::cout << "Compilation...\n\n";
 	std::string line;
 	while (std::getline(infile, line)) {
 		mlc::Command command = mlc::extract_command(line);
 
-		std::cout << command.convert() << '\n';
+		if (command.name().empty()) continue;
+
+		if (mlc::verify_command(command)) {
+			std::string rawcommand = command.convert();
+			outfile << rawcommand << '\n';
+			std::cout << line << "\t -> " << rawcommand << '\n';
+		} else {
+			std::cout << line << " -> " << "Compilation error\n";
+			break;
+		}
 	}
+
+	infile.close();
+	outfile.close();
 	
 	std::cin.get();
 	return 0;
