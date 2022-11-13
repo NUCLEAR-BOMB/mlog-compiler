@@ -17,8 +17,10 @@ int main(int argc, char* argv[])
 		infilepath = argv[1];
 		outfilepath = argv[2];
 	} else {
-		std::cerr << "\nWrong number of arguments\n";
-		std::exit(1);
+		//std::cerr << "\nWrong number of arguments\n";
+		//std::exit(1);
+		infilepath = "t.txt";
+		outfilepath = "out.txt";
 	}
 
 	std::cout << "Opening file...\n";
@@ -41,10 +43,15 @@ int main(int argc, char* argv[])
 	while (std::getline(infile, line)) 
 	{
 		// get string using a delimiter
+
+		if (line.find_first_not_of(' ') == std::string::npos) continue;
+		mlc::check_line_comment(line);
+
 		std::stringstream ss{line};
 		while (std::getline(ss, line, ';'))
 		{
 			mlc::Command command;
+
 			if (!mlc::extract_command(line, command)) compilation_error(line);
 
 			// continue if the command is an empty line
@@ -67,6 +74,6 @@ int main(int argc, char* argv[])
 	infile.close();
 	outfile.close();
 	
-	//std::cin.get();
+	std::cin.get();
 	return 0;
 }

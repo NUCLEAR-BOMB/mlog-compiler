@@ -24,7 +24,8 @@ namespace {
 	});
 }
 
-bool mlc::verify_command(const mlc::Command& command) noexcept {
+bool mlc::verify_command(const mlc::Command& command) noexcept 
+{
 	for (const auto& i : COMMAND_LIST) {
 		if (i == command.type()) return true;
 	}
@@ -76,5 +77,17 @@ bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 
 	outcommand = mlc::Command(cmnd, args);
 	return true;
+}
+
+bool mlc::check_line_comment(std::string& line) noexcept
+{
+	auto commentPos = line.find_first_of('#');
+	
+	if (commentPos != std::string::npos) {
+		line = line.substr(0, commentPos);
+		return true;
+	}
+
+	return false;
 }
 
