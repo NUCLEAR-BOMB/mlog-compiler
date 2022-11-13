@@ -8,3 +8,5 @@ A compiler that turns some code into mlog.
   - command name
   - closing parentheses
 - Call multiple commands on one line (;)
+
+- Single-line comments (#)
