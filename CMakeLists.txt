@@ -11,7 +11,7 @@ file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/compiler
 if (MSVC)
 	add_compile_options(/W4 /WX)
 else()
-	add_compile_options(-Wall -Wextra -pedantic -Werror)
+	add_compile_options(-Wall -Wextra -pedantic -Werror -Wno-reorder)
 endif()
 
 add_executable("mlog-compiler" ${SOURCE_FILES} ${HEADER_FILES})

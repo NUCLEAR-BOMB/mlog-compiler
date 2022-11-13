@@ -5,7 +5,7 @@
 #include <sstream>
 #include <regex>
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	std::string infilepath;
 	std::string outfilepath;
