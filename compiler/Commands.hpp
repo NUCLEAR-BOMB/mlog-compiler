@@ -15,8 +15,8 @@ namespace mlc
 		CommandType(const std::string& command, arguments_count_type arguments_count) noexcept
 			: m_command(command), m_arguments_count(arguments_count) {}
 
-		CommandType(const CommandType&) noexcept 
-			: m_command(""), m_arguments_count(0) {}
+		CommandType(const CommandType& other) noexcept 
+			: m_command(other.m_command), m_arguments_count(other.m_arguments_count) {}
 
 		const std::string& name() const & noexcept { return m_command; }
 		arguments_count_type arg_count() const noexcept { return m_arguments_count; }
