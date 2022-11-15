@@ -1,35 +1,25 @@
 #include "Parsing.hpp"
 
-#include <string>
-#include <string_view>
 #include <sstream>
 #include <array>
 #include <iostream>
 #include <regex>
 
-namespace {
-	// Table of some mlog commands
-	static const std::array<mlc::CommandType, 11> COMMAND_LIST({
-		mlc::CommandType(std::string("read"), 3),
-		mlc::CommandType(std::string("write"), 3),
-		mlc::CommandType(std::string("draw"), 7),
-		mlc::CommandType(std::string("print"), 1),
-		mlc::CommandType(std::string("drawflush"), 1),
-		mlc::CommandType(std::string("printflush"), 1),
-		mlc::CommandType(std::string("getlink"), 2),
-		mlc::CommandType(std::string("control"), 6),
-		mlc::CommandType(std::string("radar"), 7),
-		mlc::CommandType(std::string("sensor"), 3),
-		mlc::CommandType(std::string("set"), 2),
-	});
-}
-
-bool mlc::verify_command(const mlc::Command& command) noexcept 
+bool mlc::get_command_type(const std::string_view cmdname, mlc::CommandType& outtype) noexcept
 {
-	for (const auto& i : COMMAND_LIST) {
-		if (i == command.type()) return true;
+	// check if COMMAND_LIST contains command.type() 
+	//auto t = mlc::COMMAND_LIST.find(mlc::CommandType(cmdname));
+	auto t = mlc::COMMAND_LIST.find(mlc::CommandType(cmdname));
+
+	if (t != mlc::COMMAND_LIST.cend()) {
+		outtype = *t;
+		return true;
 	}
 	return false;
+}
+
+bool mlc::get_command_type(const std::string_view cmdname) noexcept {
+	return mlc::COMMAND_LIST.find(mlc::CommandType(cmdname)) != mlc::COMMAND_LIST.cend();
 }
 
 bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
@@ -75,7 +65,12 @@ bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 		if (line[j] != ' ') return false;
 	}
 
-	outcommand = mlc::Command(cmnd, args);
+	mlc::CommandType cmdtype;
+	bool is_command_exist = mlc::get_command_type(cmnd, cmdtype);
+
+	if (!is_command_exist) return false;
+
+	outcommand = mlc::Command(cmnd, args, cmdtype.out_arg());
 	return true;
 }
 
