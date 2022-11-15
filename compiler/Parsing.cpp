@@ -61,9 +61,7 @@ bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 	if (commandEnd == std::string::npos) return false;
 
 	// check if there are extra characters after the command
-	for (std::size_t j = commandEnd + 1; j < line.size(); ++j) {
-		if (line[j] != ' ') return false;
-	}
+	if (std::find_if_not(line.begin() + commandEnd + 1, line.end(), ::isspace) != line.end()) return false;
 
 	mlc::CommandType cmdtype;
 	bool is_command_exist = mlc::get_command_type(cmnd, cmdtype);
