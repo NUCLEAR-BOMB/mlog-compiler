@@ -26,16 +26,16 @@ int main(int argc, char* argv[])
 		outfilepath = "out.txt";
 	}
 
-	std::cout << "Opening file...\n";
-
+	std::clog << "Opening (" << infilepath << ")\n";
 	std::fstream infile(infilepath, std::fstream::in);
 	if (!infile.is_open()) {
-		std::cerr << "\nFile doesnt exists\n";
+		std::cerr << "Input file open error\n";
 		std::exit(1);
 	}
+
 	std::fstream outfile(outfilepath, std::fstream::trunc | std::fstream::out);
 	if (!outfile.is_open()) {
-		std::cerr << "\nWrite file error\n";
+		std::cerr << "Output file open error\n";
 		std::exit(1);
 	}
 
@@ -49,9 +49,7 @@ int main(int argc, char* argv[])
 
 	mlc::VariablesPool varpool;
 
-	std::cout << "Compilation...\n\n";
-
-	
+	std::clog << "Compilation...\n\n";
 
 	// get line
 	std::string line;
@@ -87,7 +85,7 @@ int main(int argc, char* argv[])
 				if (varpool.add(command)) {
 					//std::cout << "Adding var\n";
 				} else {
-					std::cout << "^^^ Error ^^^\n";
+					std::clog << "^^^ Error ^^^\n";
 					is_compilation_with_error = true;
 					//compilation_error(line);
 				}
