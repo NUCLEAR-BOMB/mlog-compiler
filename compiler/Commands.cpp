@@ -31,6 +31,7 @@ const mlc::Command::argument_type& mlc::Command::out_arg() const noexcept {
 mlc::raw_mlog_command_type mlc::Command::convert() const noexcept
 {
     using namespace std::string_literals;
+
     raw_mlog_command_type out = m_command;
     for (const auto& s : m_args) {
         out += " "s;
@@ -93,5 +94,5 @@ bool mlc::CommandType::operator<(const CommandType& right) const noexcept {
 }
 
 bool mlc::is_creating_var(const mlc::CommandType& cmdtype) noexcept {
-    return cmdtype.out_arg_index() < 0;
+    return cmdtype.out_arg_index() >= 0;
 }
