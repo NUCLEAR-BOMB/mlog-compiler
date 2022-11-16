@@ -27,7 +27,7 @@ bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 	std::istringstream linestream{ std::string(line) };
 
 	// Remove leading, trailing and extra spaces
-	line = std::regex_replace(line, std::regex("^ +| +$|( ) +"), "$1");
+	//line = std::regex_replace(line, std::regex("^ +| +$|( ) +"), "$1");
 
 	auto commandArgsStart = line.find_first_of('(');
 	if (commandArgsStart == std::string::npos) return false;
@@ -37,7 +37,6 @@ bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 
 	std::vector<std::string> args; args.reserve(8);
 
-	std::string argstr;
 	std::size_t i;
 	for (i = commandArgsStart + 1; i < line.size(); ++i) 
 	{
@@ -47,7 +46,8 @@ bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 
 			// check if this the last argument
 			if (endArg == std::string::npos) {
-				args.emplace_back(line.substr(i, line.find_first_of(" )", i) - i));
+				auto argstr = line.substr(i, line.find_first_of(')', i) - i);
+				args.emplace_back(argstr.substr(0, argstr.find_last_not_of(" \t") + 1));
 				break;
 			} else {
 				args.emplace_back(line.substr(i, endArg - i));
