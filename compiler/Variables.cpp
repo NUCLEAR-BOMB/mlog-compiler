@@ -7,6 +7,7 @@
 
 bool mlc::VariablesPool::add(const Variable& varname) noexcept
 {
+	// Check if varname is variable
 	if (!is_variable_valid(varname)) return false;
 
 	m_pool.insert(varname.name());
@@ -29,6 +30,10 @@ mlc::Variable::Variable(const std::string& name) noexcept
 	: m_name(name)
 {}
 
+const std::string& mlc::Variable::name() const noexcept {
+	return m_name;
+}
+
 bool mlc::Variable::operator<(const Variable& right) const noexcept {
 	return m_name < right.m_name;
 }
@@ -42,7 +47,7 @@ bool mlc::is_variable_valid(const mlc::Variable& var) noexcept {
 	bool quoted_text = ((varname.front() == '\"' && varname.back() == '\"') ||
 		(varname.front() == '\'' && varname.back() == '\''));
 
-	return !only_digits && !quoted_text;;
+	return !only_digits && !quoted_text;
 }
 
 bool mlc::is_command_variables_valid(const VariablesPool& pool, const mlc::Command& cmd) noexcept
@@ -51,10 +56,14 @@ bool mlc::is_command_variables_valid(const VariablesPool& pool, const mlc::Comma
 	const auto& ignore_args = cmd.ignore_args();
 	for (std::size_t i = 0; i < args.size(); ++i)
 	{
+		// Skip out arg
 		if (mlc::is_creating_var(cmd) && (i == static_cast<std::size_t>(cmd.out_arg_index()))) continue;
+		// Skip ignored args
 		if (std::find(ignore_args.cbegin(), ignore_args.cend(), i) != ignore_args.cend()) continue;
 
+		// Skip if not variable
 		if (!mlc::is_variable_valid(args[i])) continue;
+		// Else check if variable contains in pool
 		if (!pool.contains(args[i])) return false;
 	}
 	return true;

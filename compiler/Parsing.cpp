@@ -33,9 +33,14 @@ bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 	if (commandArgsStart == std::string::npos) return false;
 
 	// Command name
-	std::string cmnd{line.substr(0, commandArgsStart)};
+	const std::string cmnd{line.substr(0, commandArgsStart)};
 
 	std::vector<std::string> args; args.reserve(8);
+
+	const auto commandEnd = line.find_first_of(')');
+
+	// check if there is a closing bracket
+	if (commandEnd == std::string::npos) return false;
 
 	std::size_t i;
 	for (i = commandArgsStart + 1; i < line.size(); ++i) 
@@ -45,9 +50,11 @@ bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 			auto endArg = line.find_first_of(',', i);
 
 			// check if this the last argument
-			if (endArg == std::string::npos) {
-				auto argstr = line.substr(i, line.find_first_of(')', i) - i);
-				args.emplace_back(argstr.substr(0, argstr.find_last_not_of(" \t") + 1));
+			if (endArg == std::string::npos) 
+			{
+				//auto argstr = line.substr(i, commandEnd - i);
+				auto lastArgEnd = line.find_last_not_of(" \t", commandEnd);
+				args.emplace_back(line.substr(i, lastArgEnd - i));
 				break;
 			} else {
 				args.emplace_back(line.substr(i, endArg - i));
@@ -56,16 +63,13 @@ bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 		}
 	}
 
-	auto commandEnd = line.find_first_of(')', i);
-	// check if there is a closing bracket
-	if (commandEnd == std::string::npos) return false;
-
 	// check if there are extra characters after the command
 	if (std::find_if_not(line.begin() + commandEnd + 1, line.end(), ::isspace) != line.end()) return false;
 
 	mlc::CommandType cmdtype;
 	bool is_command_exist = mlc::get_command_type(cmnd, cmdtype);
 
+	// Check if the command name exists
 	if (!is_command_exist) return false;
 
 	outcommand = mlc::Command(args, cmdtype);

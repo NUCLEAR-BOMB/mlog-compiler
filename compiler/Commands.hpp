@@ -23,6 +23,8 @@ namespace mlc
 		static_assert(NO_OUT_ARG < 0);
 
 		CommandType() noexcept;
+
+		// Main constructor
 		CommandType(
 			const std::string_view command, 
 			arguments_count_type arguments_count = ~std::size_t(0), 
@@ -32,6 +34,7 @@ namespace mlc
 
 		//CommandType(const CommandType&) noexcept = default;
 
+		// Implicit convertion from mlc::Command
 		CommandType(const Command& cmd) noexcept;
 
 		const std::string& name() const& noexcept;
@@ -40,13 +43,14 @@ namespace mlc
 		const ignore_args_type& ignore_args() const noexcept;
 
 		bool operator==(const CommandType& right) const noexcept;
+		// For std::set
 		bool operator<(const CommandType& right) const noexcept;
 
 	protected:
-		std::string m_command;
+		std::string			 m_command;
 		arguments_count_type m_arguments_count;
-		out_arg_type m_out_arg;
-		ignore_args_type m_ignore_args;
+		out_arg_type		 m_out_arg;
+		ignore_args_type	 m_ignore_args;
 	};
 
 	class Command : public CommandType
@@ -68,9 +72,13 @@ namespace mlc
 
 		const args_type& args() const noexcept;
 
+		// Explicit return mlc::CommandType
 		CommandType type() const noexcept;
+
+		// Return the value of the out argument
 		const argument_type& out_arg() const noexcept;
 
+		// Convert to raw mlog command
 		raw_mlog_command_type convert() const noexcept;
 
 		const argument_type& operator[](std::size_t index) const;
@@ -79,12 +87,12 @@ namespace mlc
 		args_type m_args;
 	};
 
-	// Check if command type creating var
+	// Check if the command type creating variable
 	bool is_creating_var(const mlc::CommandType& cmdtype) noexcept;
 
 	// Table of some mlog commands
 	const std::set<mlc::CommandType> COMMAND_LIST({
-		//				 <name>	<arg count> <out arg>
+		//				 <name>	<arg count> <out arg> <ignored args>
 		mlc::CommandType("read",		3,	0,	{}),
 		mlc::CommandType("write",		3,	-1, {}),
 		mlc::CommandType("draw",		7,	-1, {0}),

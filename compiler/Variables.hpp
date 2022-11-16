@@ -13,8 +13,9 @@ namespace mlc
 		Variable(const std::string_view name) noexcept;
 		Variable(const std::string& name) noexcept;
 
-		const std::string& name() const noexcept { return m_name; }
+		const std::string& name() const noexcept;
 
+		// For std::set
 		bool operator<(const Variable& right) const noexcept;
 
 	private:
@@ -25,17 +26,22 @@ namespace mlc
 	{
 	public:
 
+		// Add a variable to pool
 		bool add(const Variable& varname) noexcept;
 
+		// Get the size of pool
 		std::size_t size() const noexcept;
 
+		// Check if the variable is in the pool
 		bool contains(const mlc::Variable& var) const noexcept;
 
 	private:
 		std::set<Variable, std::less<>> m_pool;
 	};
 
+	// Check if the variable is variable
 	bool is_variable_valid(const mlc::Variable& var) noexcept;
 
+	// Check if all available variables in command valid
 	bool is_command_variables_valid(const VariablesPool& pool, const mlc::Command& cmd) noexcept;
 }
