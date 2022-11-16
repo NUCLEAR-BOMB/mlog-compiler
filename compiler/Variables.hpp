@@ -25,17 +25,16 @@ namespace mlc
 	{
 	public:
 
-		bool add(const mlc::Command& cmd) noexcept;
+		bool add(const Variable& varname) noexcept;
 
 		std::size_t size() const noexcept;
 
 		bool contains(const mlc::Variable& var) const noexcept;
 
-		static bool is_creating_var(const mlc::CommandType& cmd) noexcept;
-
 	private:
 		std::set<Variable, std::less<>> m_pool;
 	};
 
-
+	bool is_creating_var(const mlc::CommandType& cmd) noexcept;
+	bool is_variable(const std::string_view varname) noexcept;
 }

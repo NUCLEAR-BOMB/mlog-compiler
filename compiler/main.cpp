@@ -81,8 +81,8 @@ int main(int argc, char* argv[])
 				continue;
 			}
 
-			if (varpool.is_creating_var(command)) {
-				if (varpool.add(command)) {
+			if (mlc::is_creating_var(command)) {
+				if (varpool.add(command.out_arg())) {
 					//std::cout << "Adding var\n";
 				} else {
 					std::clog << "^^^ Error ^^^\n";

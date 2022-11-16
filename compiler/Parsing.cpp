@@ -68,7 +68,7 @@ bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 
 	if (!is_command_exist) return false;
 
-	outcommand = mlc::Command(cmnd, args, cmdtype.out_arg());
+	outcommand = mlc::Command(cmnd, args, cmdtype.out_arg_index());
 	return true;
 }
 

@@ -29,7 +29,7 @@ namespace mlc
 
 		const std::string& name() const& noexcept;
 		arguments_count_type arg_count() const noexcept;
-		out_arg_type out_arg() const noexcept;
+		out_arg_type out_arg_index() const noexcept;
 
 		bool operator==(const CommandType& right) const noexcept;
 		bool operator<(const CommandType& right) const noexcept;
@@ -50,11 +50,12 @@ namespace mlc
 		using out_arg_type = typename Base::out_arg_type;
 
 		Command() noexcept;
-		Command(const std::string& command, const args_type& args, out_arg_type out_arg = Base::NO_OUT_ARG) noexcept;
+		Command(const std::string& command, const args_type& args, out_arg_type out_arg_index = Base::NO_OUT_ARG) noexcept;
 
 		const args_type& args() const noexcept;
 
 		CommandType type() const noexcept;
+		const argument_type& out_arg() const noexcept;
 
 		raw_mlog_command_type convert() const noexcept;
 

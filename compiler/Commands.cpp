@@ -5,8 +5,8 @@
 mlc::Command::Command() noexcept
 {}
 
-mlc::Command::Command(const std::string& command, const args_type& args, out_arg_type out_arg) noexcept
-    : m_args(args), Base(command, args.size(), out_arg) {}
+mlc::Command::Command(const std::string& command, const args_type& args, out_arg_type out_arg_index) noexcept
+    : m_args(args), Base(command, args.size(), out_arg_index) {}
 
 const mlc::Command::args_type& mlc::Command::args() const noexcept {
     return m_args;
@@ -14,6 +14,10 @@ const mlc::Command::args_type& mlc::Command::args() const noexcept {
 
 mlc::CommandType mlc::Command::type() const noexcept {
     return CommandType(m_command, Base::arg_count(), 0);
+}
+
+const mlc::Command::argument_type& mlc::Command::out_arg() const noexcept {
+    return m_args.at(Base::out_arg_index());
 }
 
 mlc::raw_mlog_command_type mlc::Command::convert() const noexcept
@@ -54,7 +58,7 @@ mlc::CommandType::arguments_count_type mlc::CommandType::arg_count() const noexc
     return m_arguments_count;
 }
 
-mlc::CommandType::out_arg_type mlc::CommandType::out_arg() const noexcept {
+mlc::CommandType::out_arg_type mlc::CommandType::out_arg_index() const noexcept {
     return m_out_arg;
 }
 

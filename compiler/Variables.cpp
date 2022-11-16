@@ -7,10 +7,10 @@
 
 namespace {
 
-	bool is_command_args_valid(const mlc::Command& cmd) noexcept 
+	bool is_variable_valid(const mlc::Variable& cmd) noexcept 
 	{
 		//std::string varname = std::regex_replace(cmd[0], std::regex("^ +| +$"), "");
-		const std::string_view varname = cmd[cmd.out_arg()];
+		const std::string_view varname = cmd.name();
 
 		bool only_digits = std::all_of(varname.begin(), varname.end(), ::isdigit);
 
@@ -22,11 +22,11 @@ namespace {
 
 }
 
-bool mlc::VariablesPool::add(const mlc::Command& cmd) noexcept 
+bool mlc::VariablesPool::add(const Variable& varname) noexcept
 {
-	if (!is_command_args_valid(cmd)) return false;
+	if (!is_variable_valid(varname)) return false;
 
-	m_pool.insert(cmd.name());
+	m_pool.insert(varname.name());
 	return true;
 }
 
@@ -38,10 +38,10 @@ bool mlc::VariablesPool::contains(const mlc::Variable& var) const noexcept {
 	return m_pool.find(var) != m_pool.cend();
 }
 
-bool mlc::VariablesPool::is_creating_var(const mlc::CommandType& cmd) noexcept {
-	return cmd.out_arg() != cmd.NO_OUT_ARG;
-}
-
 bool mlc::Variable::operator<(const Variable& right) const noexcept {
 	return m_name < right.m_name;
+}
+
+bool mlc::is_creating_var(const mlc::CommandType& cmd) noexcept {
+	return cmd.out_arg_index() != cmd.NO_OUT_ARG;
 }
