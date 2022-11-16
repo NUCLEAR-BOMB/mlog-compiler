@@ -10,8 +10,8 @@ namespace mlc
 	{
 	public:
 
-		Variable(const std::string& name) noexcept
-			: m_name(name) {}
+		Variable(const std::string_view name) noexcept;
+		Variable(const std::string& name) noexcept;
 
 		const std::string& name() const noexcept { return m_name; }
 
@@ -35,6 +35,10 @@ namespace mlc
 		std::set<Variable, std::less<>> m_pool;
 	};
 
-	bool is_creating_var(const mlc::CommandType& cmd) noexcept;
-	bool is_variable(const std::string_view varname) noexcept;
+	bool is_variable_valid(const mlc::Variable& var) noexcept;
+
+	// Check if command type creating var
+	bool is_creating_var(const mlc::CommandType& cmdtype) noexcept;
+
+	bool is_command_variables_valid(const VariablesPool& pool, const mlc::Command& cmd) noexcept;
 }

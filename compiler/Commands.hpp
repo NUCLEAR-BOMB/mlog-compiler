@@ -17,11 +17,17 @@ namespace mlc
 	public:
 		using arguments_count_type = std::size_t;
 		using out_arg_type = int;
+		using ignore_args_type = std::vector<unsigned short>;
 
 		static constexpr out_arg_type NO_OUT_ARG = -1;
 
 		CommandType() noexcept;
-		CommandType(const std::string_view command, arguments_count_type arguments_count = ~std::size_t(0), out_arg_type out_arg_ = NO_OUT_ARG) noexcept;
+		CommandType(
+			const std::string_view command, 
+			arguments_count_type arguments_count = ~std::size_t(0), 
+			out_arg_type out_arg_				 = NO_OUT_ARG, 
+			const ignore_args_type& ignore_args	 = ignore_args_type()
+		) noexcept;
 
 		//CommandType(const CommandType&) noexcept = default;
 
@@ -30,6 +36,7 @@ namespace mlc
 		const std::string& name() const& noexcept;
 		arguments_count_type arg_count() const noexcept;
 		out_arg_type out_arg_index() const noexcept;
+		const ignore_args_type& ignore_args() const noexcept;
 
 		bool operator==(const CommandType& right) const noexcept;
 		bool operator<(const CommandType& right) const noexcept;
@@ -38,11 +45,16 @@ namespace mlc
 		std::string m_command;
 		arguments_count_type m_arguments_count;
 		out_arg_type m_out_arg;
+		ignore_args_type m_ignore_args;
 	};
 
 	class Command : public CommandType
 	{
 		using Base = CommandType;
+
+		//friend bool extract_command(std::string&, mlc::Command&) noexcept;
+
+		Command(const CommandType& type) noexcept;
 	public:
 		using args_type = std::vector<std::string>;
 		using argument_type = std::string;
@@ -51,6 +63,7 @@ namespace mlc
 
 		Command() noexcept;
 		Command(const std::string& command, const args_type& args, out_arg_type out_arg_index = Base::NO_OUT_ARG) noexcept;
+		Command(const args_type& args, const CommandType& cmdtype) noexcept;
 
 		const args_type& args() const noexcept;
 
@@ -68,17 +81,17 @@ namespace mlc
 	// Table of some mlog commands
 	const std::set<mlc::CommandType> COMMAND_LIST({
 		//				 <name>	<arg count> <out arg>
-		mlc::CommandType("read",		3,	0),
-		mlc::CommandType("write",		3	 ),
-		mlc::CommandType("draw",		7	 ),
-		mlc::CommandType("print",		1	 ),
-		mlc::CommandType("drawflush",	1	 ),
-		mlc::CommandType("printflush",	1	 ),
-		mlc::CommandType("getlink",		2,	0),
-		mlc::CommandType("control",		6	 ),
-		mlc::CommandType("radar",		7,	6),
-		mlc::CommandType("sensor",		3,	0),
-		mlc::CommandType("set",			2,	0),
+		mlc::CommandType("read",		3,	0,	{}),
+		mlc::CommandType("write",		3,	-1, {}),
+		mlc::CommandType("draw",		7,	-1, {0}),
+		mlc::CommandType("print",		1,	-1, {}),
+		mlc::CommandType("drawflush",	1,	-1, {0}),
+		mlc::CommandType("printflush",	1,	-1, {0}),
+		mlc::CommandType("getlink",		2,	0,	{1}),
+		mlc::CommandType("control",		6,	-1, {}),
+		mlc::CommandType("radar",		7,	6,	{}),
+		mlc::CommandType("sensor",		3,	0,	{}),
+		mlc::CommandType("set",			2,	0,	{}),
 	});
 
 }

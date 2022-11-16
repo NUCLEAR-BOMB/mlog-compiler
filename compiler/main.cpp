@@ -10,6 +10,8 @@
 
 int main(int argc, char* argv[])
 {
+	(void)mlc::COMMAND_LIST;
+
 	std::string infilepath;
 	std::string outfilepath;
 
@@ -81,11 +83,16 @@ int main(int argc, char* argv[])
 				continue;
 			}
 
+			if (!mlc::is_command_variables_valid(varpool, command)) {
+				std::cerr << "^^^ Using unknown variable ^^^\n";
+				is_compilation_with_error = true;
+			}
+
 			if (mlc::is_creating_var(command)) {
 				if (varpool.add(command.out_arg())) {
 					//std::cout << "Adding var\n";
 				} else {
-					std::clog << "^^^ Error ^^^\n";
+					std::cerr << "^^^ Invalid variable ^^^\n";
 					is_compilation_with_error = true;
 					//compilation_error(line);
 				}
@@ -97,7 +104,7 @@ int main(int argc, char* argv[])
 	infile.close();
 
 	if (is_compilation_with_error) {
-		outfile << "\nCOMPILATION FAILED WITH AN ERROR";
+		outfile << "\n# COMPILATION FAILED WITH AN ERROR";
 	}
 
 	outfile.close();
