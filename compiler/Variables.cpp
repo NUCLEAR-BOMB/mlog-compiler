@@ -55,7 +55,7 @@ bool mlc::is_command_variables_valid(const VariablesPool& pool, const mlc::Comma
 	const auto& ignore_args = cmd.ignore_args();
 	for (std::size_t i = 0; i < args.size(); ++i)
 	{
-		if (mlc::is_creating_var(cmd) && (i == cmd.out_arg_index())) continue;
+		if (mlc::is_creating_var(cmd) && (i == static_cast<std::size_t>(cmd.out_arg_index()))) continue;
 		if (std::find(ignore_args.cbegin(), ignore_args.cend(), i) != ignore_args.cend()) continue;
 
 		if (!mlc::is_variable_valid(args[i])) continue;
