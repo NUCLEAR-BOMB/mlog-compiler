@@ -7,4 +7,5 @@ A compiler that turns some code into mlog.
   - Number of arguments
   - Command name
   - Closing parentheses
+  - Variable-checking system
 - Call multiple commands on one line (;)
