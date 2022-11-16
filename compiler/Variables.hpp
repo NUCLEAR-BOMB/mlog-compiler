@@ -37,8 +37,5 @@ namespace mlc
 
 	bool is_variable_valid(const mlc::Variable& var) noexcept;
 
-	// Check if command type creating var
-	bool is_creating_var(const mlc::CommandType& cmdtype) noexcept;
-
 	bool is_command_variables_valid(const VariablesPool& pool, const mlc::Command& cmd) noexcept;
 }

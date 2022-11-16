@@ -20,6 +20,7 @@ namespace mlc
 		using ignore_args_type = std::vector<unsigned short>;
 
 		static constexpr out_arg_type NO_OUT_ARG = -1;
+		static_assert(NO_OUT_ARG < 0);
 
 		CommandType() noexcept;
 		CommandType(
@@ -77,6 +78,9 @@ namespace mlc
 	protected:
 		args_type m_args;
 	};
+
+	// Check if command type creating var
+	bool is_creating_var(const mlc::CommandType& cmdtype) noexcept;
 
 	// Table of some mlog commands
 	const std::set<mlc::CommandType> COMMAND_LIST({

@@ -45,10 +45,6 @@ bool mlc::is_variable_valid(const mlc::Variable& var) noexcept {
 	return !only_digits && !quoted_text;;
 }
 
-bool mlc::is_creating_var(const mlc::CommandType& cmdtype) noexcept {
-	return cmdtype.out_arg_index() != cmdtype.NO_OUT_ARG;
-}
-
 bool mlc::is_command_variables_valid(const VariablesPool& pool, const mlc::Command& cmd) noexcept
 {
 	const auto& args = cmd.args();

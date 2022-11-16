@@ -91,3 +91,7 @@ bool mlc::CommandType::operator==(const CommandType& right) const noexcept {
 bool mlc::CommandType::operator<(const CommandType& right) const noexcept {
     return m_command < right.m_command;
 }
+
+bool mlc::is_creating_var(const mlc::CommandType& cmdtype) noexcept {
+    return cmdtype.out_arg_index() < 0;
+}
