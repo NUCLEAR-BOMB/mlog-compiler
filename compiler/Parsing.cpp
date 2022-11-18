@@ -5,26 +5,9 @@
 #include <iostream>
 #include <regex>
 
-bool mlc::get_command_type(const std::string_view cmdname, mlc::CommandType& outtype) noexcept
-{
-	// check if COMMAND_LIST contains command.type() 
-	//auto t = mlc::COMMAND_LIST.find(mlc::CommandType(cmdname));
-	auto t = mlc::COMMAND_LIST.find(mlc::CommandType(cmdname));
-
-	if (t != mlc::COMMAND_LIST.cend()) {
-		outtype = *t;
-		return true;
-	}
-	return false;
-}
-
-bool mlc::get_command_type(const std::string_view cmdname) noexcept {
-	return mlc::COMMAND_LIST.find(mlc::CommandType(cmdname)) != mlc::COMMAND_LIST.cend();
-}
-
 bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 {
-	std::istringstream linestream{ std::string(line) };
+	//std::istringstream linestream{ std::string(line) };
 
 	// Remove leading, trailing and extra spaces
 	//line = std::regex_replace(line, std::regex("^ +| +$|( ) +"), "$1");
@@ -67,12 +50,44 @@ bool mlc::extract_command(std::string& line, mlc::Command& outcommand) noexcept
 	if (std::find_if_not(line.begin() + commandEnd + 1, line.end(), ::isspace) != line.end()) return false;
 
 	mlc::CommandType cmdtype;
-	bool is_command_exist = mlc::get_command_type(cmnd, cmdtype);
+	bool is_command_exist = mlc::find_command_type(cmnd, cmdtype);
 
 	// Check if the command name exists
 	if (!is_command_exist) return false;
 
 	outcommand = mlc::Command(args, cmdtype);
+	return true;
+}
+
+bool mlc::extract_operator(std::string& line, mlc::Operator& outoperator) noexcept
+{
+	using op = mlc::Operator;
+
+	auto firstArgStart = line.find_first_not_of(" \t");
+	auto firstArgEnd = line.find_first_of(" \n", firstArgStart);
+	if (firstArgEnd == std::string::npos) return false;
+
+	auto operatorNameStart = line.find_first_not_of(" \t", firstArgEnd + 1);
+	auto operatorNameEnd = line.find_first_of(" \t", operatorNameStart + 1);
+	if (operatorNameStart != operatorNameEnd - 1) return false;
+
+	auto secondArgStart = line.find_first_not_of(" \t", operatorNameEnd + 1);
+	auto secondArgEnd = line.find_first_of(" \t", secondArgStart + 1) - 1;
+
+	typename op::name_type opname;
+	typename op::argument_type first, second;
+	
+	first = line.substr(firstArgStart, firstArgEnd - firstArgStart);
+	opname = line[operatorNameStart];
+	second = line.substr(secondArgStart, secondArgEnd - secondArgStart);
+
+	mlc::OperatorType optype;
+	bool is_operator_exist = mlc::find_operator_type(opname, optype);
+
+	if (!is_operator_exist) return false;
+
+	outoperator = mlc::Operator(first, second, optype);
+
 	return true;
 }
 

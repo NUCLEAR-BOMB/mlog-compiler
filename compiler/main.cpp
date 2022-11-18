@@ -69,19 +69,26 @@ int main(int argc, char* argv[])
 			if (line.find_first_not_of(' ') == std::string::npos) continue;
 
 			mlc::Command command;
+			mlc::Operator op;
 
+			if (mlc::extract_operator(line, op)) {
+				command = op.convert_to_command();
+			}
+			else
 			if (mlc::extract_command(line, command)) {
-				// write mlog command to output file
-				std::string rawcommand = command.convert();
-				outfile << rawcommand << '\n';
-
-				// print status
-				std::cout << line << "\t -> " << rawcommand << '\n';
+				
 			}
 			else {
 				compilation_error(line);
 				continue;
 			}
+
+			mlc::raw_mlog_command_type rawcommand = command.convert();
+			// write mlog command to output file
+			outfile << rawcommand << '\n';
+
+			// print status
+			std::cout << line << "\t -> " << rawcommand << '\n';
 
 			if (!mlc::is_command_variables_valid(varpool, command)) {
 				std::cerr << "^^^ Using unknown variable ^^^\n";

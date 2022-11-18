@@ -96,3 +96,16 @@ bool mlc::CommandType::operator<(const CommandType& right) const noexcept {
 bool mlc::is_creating_var(const mlc::CommandType& cmdtype) noexcept {
     return cmdtype.out_arg_index() >= 0;
 }
+
+bool mlc::find_command_type(const std::string_view name, mlc::CommandType& type) noexcept
+{
+    // check if COMMAND_LIST contains command.type() 
+    //auto t = mlc::COMMAND_LIST.find(mlc::CommandType(cmdname));
+    auto t = mlc::COMMAND_LIST.find(mlc::CommandType(name));
+
+    if (t != mlc::COMMAND_LIST.cend()) {
+        type = *t;
+        return true;
+    }
+    return false;
+}

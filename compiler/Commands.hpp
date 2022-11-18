@@ -106,4 +106,6 @@ namespace mlc
 		mlc::CommandType("set",			2,	0,	{}),
 	});
 
+	bool find_command_type(const std::string_view name, mlc::CommandType& type) noexcept;
+
 }
