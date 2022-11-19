@@ -51,6 +51,7 @@ int main(int argc, char* argv[])
 	};
 
 	mlc::VariablesPool varpool;
+	mlc::ErrorTrace lasterror;
 
 	std::clog << "Compilation...\n\n";
 
@@ -73,15 +74,27 @@ int main(int argc, char* argv[])
 			mlc::Command command;
 			mlc::Operator op;
 
-			if (mlc::extract_operator(line, op)) {
+			lasterror.clear();
+
+			if (!lasterror.push(mlc::extract_operator(line, op)).critical()) {
+				
 				command = op.convert_to_command();
 			}
 			else
-			if (mlc::extract_command(line, command)) {
+			if (!lasterror.push(mlc::extract_command(line, command)).critical()) {
 				
 			}
-			else {
-				compilation_error(line);
+
+			if (!mlc::is_command_variables_valid(varpool, command))
+			{
+				//std::cerr << "^^^ Using unknown variable ^^^\n";
+				lasterror.push(mlc::Error(line, "Using unknown variable"));
+				is_compilation_with_error = true;
+			}
+
+			if (lasterror) {
+				std::cerr << lasterror << '\n';
+				is_compilation_with_error = true;
 				continue;
 			}
 
@@ -91,11 +104,6 @@ int main(int argc, char* argv[])
 
 			// print status
 			std::cout << line.get() << "\t -> " << rawcommand << '\n';
-
-			if (!mlc::is_command_variables_valid(varpool, command)) {
-				std::cerr << "^^^ Using unknown variable ^^^\n";
-				is_compilation_with_error = true;
-			}
 
 			if (mlc::is_creating_var(command)) {
 				if (varpool.add(command.out_arg())) {
