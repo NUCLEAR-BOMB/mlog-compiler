@@ -15,16 +15,19 @@ namespace mlc
 		operator const value_type&() const& noexcept;
 		//operator value_type() && noexcept;
 
+		value_type& get() noexcept;
+		const value_type& get() const noexcept;
+
 		line_counter_type line() const noexcept;
 
 		Line& operator++() noexcept;
-		Line operator++(int) noexcept;
+		//Line operator++(int) noexcept;
 		Line& operator--() noexcept;
-		Line operator-(int) noexcept;
+		//Line operator-(int) noexcept;
 
 	private:
 		value_type m_data;
-		line_counter_type m_counter;
+		line_counter_type m_counter = 0;
 	};
 
 }

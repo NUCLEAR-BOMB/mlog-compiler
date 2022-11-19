@@ -1,6 +1,7 @@
 #include "Parsing.hpp"
 #include "Variables.hpp"
 #include "Commands.hpp"
+#include "Line.hpp"
 
 #include <fstream>
 #include <string>
@@ -42,9 +43,9 @@ int main(int argc, char* argv[])
 	}
 
 	bool is_compilation_with_error = false;
-	auto compilation_error = [&](std::string_view v) 
+	auto compilation_error = [&](const mlc::Line& line) 
 	{
-		std::cerr << v << " -> " << "Compilation error\n";
+		std::cerr << line.line() << " " << line.get() << " -> " << "Compilation error\n";
 		is_compilation_with_error = true;
 		//std::exit(1);
 	};
@@ -54,19 +55,20 @@ int main(int argc, char* argv[])
 	std::clog << "Compilation...\n\n";
 
 	// get line
-	std::string line;
-	while (std::getline(infile, line)) 
+	mlc::Line line;
+	while (std::getline(infile, (++line).get()))
 	{
+
 		// skip a line if it is empty
-		if (line.find_first_not_of(' ') == std::string::npos) continue;
-		mlc::check_line_comment(line);
+		if (line.get().find_first_not_of(' ') == std::string::npos) continue;
+		mlc::uncomment_line(line);
 
 		// get string using a delimiter
-		std::stringstream ss{line};
-		while (std::getline(ss, line, ';'))
+		std::stringstream ss{line.get()};
+		while (std::getline(ss, line.get(), ';'))
 		{
 			// skip a line if it is empty
-			if (line.find_first_not_of(' ') == std::string::npos) continue;
+			if (line.get().find_first_not_of(' ') == std::string::npos) continue;
 
 			mlc::Command command;
 			mlc::Operator op;
@@ -88,7 +90,7 @@ int main(int argc, char* argv[])
 			outfile << rawcommand << '\n';
 
 			// print status
-			std::cout << line << "\t -> " << rawcommand << '\n';
+			std::cout << line.get() << "\t -> " << rawcommand << '\n';
 
 			if (!mlc::is_command_variables_valid(varpool, command)) {
 				std::cerr << "^^^ Using unknown variable ^^^\n";
