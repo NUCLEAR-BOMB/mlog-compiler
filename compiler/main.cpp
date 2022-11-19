@@ -43,15 +43,16 @@ int main(int argc, char* argv[])
 	}
 
 	bool is_compilation_with_error = false;
-	auto compilation_error = [&](const mlc::Line& line) 
-	{
-		std::cerr << line.line() << " " << line.get() << " -> " << "Compilation error\n";
-		is_compilation_with_error = true;
-		//std::exit(1);
-	};
+
+	//auto compilation_error = [&](const mlc::Line& line) 
+	//{
+	//	std::cerr << line.line() << " " << line.get() << " -> " << "Compilation error\n";
+	//	is_compilation_with_error = true;
+	//	//std::exit(1);
+	//};
 
 	mlc::VariablesPool varpool;
-	mlc::ErrorTrace lasterror;
+	mlc::ErrorTrace errortrace;
 
 	std::clog << "Compilation...\n\n";
 
@@ -74,26 +75,34 @@ int main(int argc, char* argv[])
 			mlc::Command command;
 			mlc::Operator op;
 
-			lasterror.clear();
+			errortrace.clear();
 
-			if (!lasterror.push(mlc::extract_operator(line, op)).critical()) {
-				
+			if (!errortrace.push(mlc::extract_operator(line, op)).critical()) {
 				command = op.convert_to_command();
 			}
 			else
-			if (!lasterror.push(mlc::extract_command(line, command)).critical()) {
+			if (!errortrace.push(mlc::extract_command(line, command)).critical()) {
 				
 			}
 
-			if (!mlc::is_command_variables_valid(varpool, command))
-			{
+			if (!mlc::is_command_variables_valid(varpool, command)) {
 				//std::cerr << "^^^ Using unknown variable ^^^\n";
-				lasterror.push(mlc::Error(line, "Using unknown variable"));
-				is_compilation_with_error = true;
+				errortrace.push(mlc::Error(line, "Using unknown variable"));
 			}
 
-			if (lasterror) {
-				std::cerr << lasterror << '\n';
+			if (mlc::is_creating_var(command)) {
+				if (varpool.add(command.out_arg())) {
+					//std::cout << "Adding var\n";
+				}
+				else {
+					//std::cerr << "^^^ Invalid variable ^^^\n";
+					errortrace.push(mlc::Error(line, "Invalid variable name"));
+					//compilation_error(line);
+				}
+			}
+
+			if (errortrace) {
+				std::cerr << errortrace << '\n';
 				is_compilation_with_error = true;
 				continue;
 			}
@@ -104,16 +113,6 @@ int main(int argc, char* argv[])
 
 			// print status
 			std::cout << line.get() << "\t -> " << rawcommand << '\n';
-
-			if (mlc::is_creating_var(command)) {
-				if (varpool.add(command.out_arg())) {
-					//std::cout << "Adding var\n";
-				} else {
-					std::cerr << "^^^ Invalid variable ^^^\n";
-					is_compilation_with_error = true;
-					//compilation_error(line);
-				}
-			}
 		}
 	}
 

@@ -32,6 +32,7 @@ namespace mlc
 		std::string m_str;
 		bool m_critical;
 	};
+	std::ostream& operator<<(std::ostream& os, const Error& err) noexcept;
 
 	class ErrorTrace
 	{
@@ -63,5 +64,6 @@ namespace mlc
 	private:
 		container_type m_trace;
 	};
+	std::ostream& operator<<(std::ostream& os, const ErrorTrace& errtrace) noexcept;
 }
 
