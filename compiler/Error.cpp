@@ -71,12 +71,15 @@ mlc::ErrorTrace::ErrorTrace(std::initializer_list<mlc::Error> list) noexcept
 {}
 
 const mlc::Error& mlc::ErrorTrace::push(const mlc::Error& error) noexcept {
+	// If error is empty do nothing
 	if (error.empty()) return error;
+
 	m_trace.push_back(error);
 	return error;
 }
 
 const mlc::ErrorTrace& mlc::ErrorTrace::push(const ErrorTrace& trace) noexcept {
+	// Merge traces
 	m_trace.insert(trace.m_trace.begin(), trace.m_trace.cbegin(), trace.m_trace.cend());
 	return trace;
 }

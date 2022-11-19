@@ -15,13 +15,18 @@ namespace mlc
 		operator const value_type&() const& noexcept;
 		//operator value_type() && noexcept;
 
+		// Get string from line
 		value_type& get() noexcept;
 		const value_type& get() const noexcept;
 
+		// Get line number
 		line_counter_type line() const noexcept;
 
+		// Increase the line number by one
 		Line& operator++() noexcept;
 		//Line operator++(int) noexcept;
+
+		// Reduce the line number by one
 		Line& operator--() noexcept;
 		//Line operator-(int) noexcept;
 

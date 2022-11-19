@@ -102,6 +102,7 @@ int main(int argc, char* argv[])
 			}
 
 			if (errortrace) {
+				// Print error trace
 				std::cerr << errortrace << '\n';
 				is_compilation_with_error = true;
 				continue;
