@@ -49,6 +49,7 @@ namespace mlc
 
 	const std::set<OperatorType> OPERATOR_LIST({
 		OperatorType('=', [](auto first, auto second) { return mlc::Command("set", { first, second }, 0); }),
+		//OperatorType('+', [](auto first, auto second) { return mlc::Command("op", {}, 0); }),
 	});
 
 	bool find_operator_type(const typename mlc::OperatorType::name_type opname, mlc::OperatorType& outoptype) noexcept;
