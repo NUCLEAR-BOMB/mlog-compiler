@@ -19,7 +19,7 @@ const mlc::Operator::argument_type& mlc::Operator::second() const noexcept {
 	return m_second_arg;
 }
 
-mlc::Command mlc::Operator::convert_to_command() const noexcept {
+mlc::Operator::Base::converted_result_type mlc::Operator::convert_to_command() const noexcept {
 	return Base::m_converted(m_first_arg, m_second_arg);
 }
 

@@ -72,51 +72,50 @@ int main(int argc, char* argv[])
 			// skip a line if it is empty
 			if (line.get().find_first_not_of(' ') == std::string::npos) continue;
 
-			mlc::Command command;
+			std::vector<mlc::Command> commandarr; commandarr.reserve(3);
 			mlc::Operator op;
 
-			if (!errortrace.push(mlc::extract_operator(line, op)).critical()) {
-				command = op.convert_to_command();
-			}
-			else
-			if (!errortrace.push(mlc::extract_command(line, command)).critical()) {
-				
-			}
+			commandarr.clear();
+				 if (!errortrace.push(mlc::extract_operator(line, commandarr)).critical());
+			else if (!errortrace.push(mlc::extract_command(line, commandarr)).critical());
 			else {
 				errortrace.push(mlc::Error(line, "Using unknown action"));
 			}
 
-			if (!mlc::is_command_variables_valid(varpool, command) && !mlc::is_creating_var(command)) {
-				//std::cerr << "^^^ Using unknown variable ^^^\n";
-				errortrace.push(mlc::Error(line, "Using unknown variable"));
-			}
-
-			if (mlc::is_creating_var(command)) {
-				if (varpool.add(command.out_arg())) {
-					//std::cout << "Adding var\n";
+			for (const auto& command : commandarr)
+			{
+				if (!mlc::is_command_variables_valid(varpool, command) && !mlc::is_creating_var(command)) {
+					//std::cerr << "^^^ Using unknown variable ^^^\n";
+					errortrace.push(mlc::Error(line, "Using unknown variable"));
 				}
-				else {
-					//std::cerr << "^^^ Invalid variable ^^^\n";
-					errortrace.push(mlc::Error(line, "Invalid variable name"));
-					//compilation_error(line);
+
+				if (mlc::is_creating_var(command)) {
+					if (varpool.add(command.out_arg())) {
+						//std::cout << "Adding var\n";
+					}
+					else {
+						//std::cerr << "^^^ Invalid variable ^^^\n";
+						errortrace.push(mlc::Error(line, "Invalid variable name"));
+						//compilation_error(line);
+					}
 				}
+
+				if (errortrace) {
+					// Print error trace
+					std::cerr << errortrace << '\n';
+					is_compilation_with_error = true;
+
+					errortrace.clear();
+					continue;
+				}
+
+				mlc::raw_mlog_command_type rawcommand = command.convert();
+				// write mlog command to output file
+				outfile << rawcommand << '\n';
+
+				// print status
+				std::cout << line.get() << "\t -> " << rawcommand << '\n';
 			}
-
-			if (errortrace) {
-				// Print error trace
-				std::cerr << errortrace << '\n';
-				is_compilation_with_error = true;
-
-				errortrace.clear();
-				continue;
-			}
-
-			mlc::raw_mlog_command_type rawcommand = command.convert();
-			// write mlog command to output file
-			outfile << rawcommand << '\n';
-
-			// print status
-			std::cout << line.get() << "\t -> " << rawcommand << '\n';
 		}
 	}
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 namespace mlc
 {
@@ -14,6 +15,10 @@ namespace mlc
 		operator value_type&() & noexcept;
 		operator const value_type&() const& noexcept;
 		//operator value_type() && noexcept;
+
+		Line() noexcept;
+		Line(const std::string_view data, line_counter_type counter) noexcept;
+		Line(const std::string_view data, const Line& other) noexcept;
 
 		// Get string from line
 		value_type& get() noexcept;

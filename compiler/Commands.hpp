@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Line.hpp"
+
 #include <string>
 #include <string_view>
 #include <vector>
@@ -89,6 +91,8 @@ namespace mlc
 
 	// Check if the command type creating variable
 	bool is_creating_var(const mlc::CommandType& cmdtype) noexcept;
+
+	std::string create_temp_variable_name(mlc::Line::line_counter_type l) noexcept;
 
 	// Table of some mlog commands
 	const std::set<mlc::CommandType> COMMAND_LIST({

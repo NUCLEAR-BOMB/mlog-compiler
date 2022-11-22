@@ -62,6 +62,8 @@ namespace mlc
 		// Check if trace have not empty errors
 		bool empty() const noexcept;
 		operator bool() const noexcept;
+
+		bool critical() const noexcept;
 		
 		// Get raw container
 		container_type& container() noexcept;

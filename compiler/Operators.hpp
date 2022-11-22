@@ -10,7 +10,8 @@ namespace mlc
 	{
 	public:
 		using name_type = char;
-		using converted_type = std::add_pointer_t<mlc::Command(const std::string&, const std::string&)>;
+		using converted_result_type = std::pair<std::string, std::vector<mlc::Command>>;
+		using converted_type = std::add_pointer_t<converted_result_type(const std::string&, const std::string&)>;
 
 		static constexpr std::size_t MAX_NAME_SIZE = 1;
 
@@ -43,14 +44,18 @@ namespace mlc
 		const argument_type& first() const noexcept;
 		const argument_type& second() const noexcept;
 
-		mlc::Command convert_to_command() const noexcept;
+		Base::converted_result_type convert_to_command() const noexcept;
 
 	protected:
 		argument_type m_first_arg, m_second_arg;
 	};
 
 	const std::set<OperatorType> OPERATOR_LIST({
-		OperatorType('=', [](auto first, auto second) { return mlc::Command("set", { first, second }, 0); }),
+		OperatorType('=', [](auto first, auto second) -> Operator::converted_result_type 
+			{ return {first, {mlc::Command("set", { first, second }, 0)}}; }),
+
+		OperatorType('+', [](auto first, auto second) -> Operator::converted_result_type
+			{ return {"TEMP", {mlc::Command("op", { "add", "TEMP", first, second}, 1)}}; }),
 		//OperatorType('+', [](auto first, auto second) { return mlc::Command("op", {}, 0); }),
 	});
 

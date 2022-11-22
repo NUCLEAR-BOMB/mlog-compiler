@@ -97,6 +97,11 @@ bool mlc::is_creating_var(const mlc::CommandType& cmdtype) noexcept {
     return cmdtype.out_arg_index() >= 0;
 }
 
+std::string mlc::create_temp_variable_name(mlc::Line::line_counter_type l) noexcept {
+    using namespace std::string_literals;
+    return "__TEMP_"s + std::to_string(l) + "__"s;
+}
+
 bool mlc::find_command_type(const std::string_view name, mlc::CommandType& type) noexcept
 {
     // check if COMMAND_LIST contains command.type() 

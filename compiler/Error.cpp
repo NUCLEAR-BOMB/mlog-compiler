@@ -1,6 +1,7 @@
 #include "Error.hpp"
 
 #include <sstream>
+#include <algorithm>
 
 mlc::Error::Error(const mlc::Line& line, const std::string_view message) noexcept 
 	: m_critical(false) {
@@ -80,7 +81,7 @@ const mlc::Error& mlc::ErrorTrace::push(const mlc::Error& error) noexcept {
 
 const mlc::ErrorTrace& mlc::ErrorTrace::push(const ErrorTrace& trace) noexcept {
 	// Merge traces
-	m_trace.insert(trace.m_trace.begin(), trace.m_trace.cbegin(), trace.m_trace.cend());
+	m_trace.insert(m_trace.begin(), trace.m_trace.begin(), trace.m_trace.end());
 	return trace;
 }
 
@@ -100,6 +101,10 @@ bool mlc::ErrorTrace::empty() const noexcept {
 
 mlc::ErrorTrace::operator bool() const noexcept {
 	return !this->empty();
+}
+
+bool mlc::ErrorTrace::critical() const noexcept {
+	return std::any_of(m_trace.cbegin(), m_trace.cend(), [](const mlc::Error& e) { return e.critical(); });
 }
 
 mlc::ErrorTrace::container_type& mlc::ErrorTrace::container() noexcept {

@@ -8,6 +8,18 @@ mlc::Line::operator const value_type& () const& noexcept {
 	return m_data;
 }
 
+mlc::Line::Line() noexcept
+	: m_data(), m_counter(0)
+{}
+
+mlc::Line::Line(const std::string_view data, line_counter_type counter) noexcept
+	: m_data(data), m_counter(counter)
+{}
+
+mlc::Line::Line(const std::string_view data, const Line& other) noexcept
+	: m_data(data), m_counter(other.m_counter)
+{}
+
 mlc::Line::value_type& mlc::Line::get() noexcept {
 	return m_data;
 }

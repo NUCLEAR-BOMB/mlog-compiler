@@ -1,12 +1,13 @@
 #include "Parsing.hpp"
 
 #include <sstream>
-#include <array>
 #include <iostream>
 #include <regex>
 
-mlc::Error mlc::extract_command(const mlc::Line& line, mlc::Command& outcommand) noexcept
+mlc::ErrorTrace mlc::extract_command(const mlc::Line& line, std::vector<mlc::Command>& outcommand) noexcept
 {
+	mlc::ErrorTrace errtrace;
+
 	const auto& strline = line.get();
 	//std::istringstream linestream{ std::string(line) };
 
@@ -14,54 +15,68 @@ mlc::Error mlc::extract_command(const mlc::Line& line, mlc::Command& outcommand)
 	//line = std::regex_replace(line, std::regex("^ +| +$|( ) +"), "$1");
 
 	auto commandArgsStart = strline.find_first_of('(');
-	if (commandArgsStart == std::string::npos) return mlc::CriticalError();
+	if (commandArgsStart == std::string::npos) return { mlc::CriticalError() };
 
 	// Command name
 	const std::string cmnd{ strline.substr(0, commandArgsStart)};
 
-	std::vector<std::string> args; args.reserve(8);
-
-	const auto commandEnd = strline.find_first_of(')');
+	const auto commandEnd = strline.find_first_of(')', commandArgsStart);
 
 	// check if there is a closing bracket
-	if (commandEnd == std::string::npos) return mlc::CriticalError();
+	if (commandEnd == std::string::npos) return { mlc::CriticalError() };
+
+	std::vector<std::string> args; args.reserve(8);
 
 	std::size_t i;
 	for (i = commandArgsStart + 1; i < strline.size(); ++i)
 	{
 		if (strline[i] != ' ') {
 			// find start of the argument
-			auto endArg = strline.find_first_of(',', i);
+			const auto endArg = strline.find_first_of(',', i);
 
-			// check if this the last argument
-			if (endArg == std::string::npos) 
+			std::string arg;
+			if (endArg == std::string::npos)
 			{
 				//auto argstr = line.substr(i, commandEnd - i);
 				auto lastArgEnd = strline.find_last_not_of(" \t", commandEnd);
-				args.emplace_back(strline.substr(i, lastArgEnd - i));
-				break;
+				arg = strline.substr(i, lastArgEnd - i);
 			} else {
-				args.emplace_back(strline.substr(i, endArg - i));
+				arg = strline.substr(i, endArg - i);
 			}
+
+			// check if this the last argument
+			errtrace.push(mlc::extract_operator(mlc::Line(arg, line), arg, outcommand));
+
+			args.push_back(std::move(arg));
+
+			if (endArg == std::string::npos) break;
+
 			i = endArg + 1;
 		}
 	}
 
 	// check if there are extra characters after the command
-	if (std::find_if_not(strline.begin() + commandEnd + 1, strline.end(), ::isspace) != strline.end()) 
-		return mlc::Error(line, "Extra characters after the command");
+	if (std::find_if_not(strline.begin() + commandEnd + 1, strline.end(), ::isspace) != strline.end()) {
+		errtrace.push(mlc::Error(line, "Extra characters after the command"));
+		return errtrace;
+	}
 
 	mlc::CommandType cmdtype;
 	bool is_command_exist = mlc::find_command_type(cmnd, cmdtype);
 
 	// Check if the command name exists
-	if (!is_command_exist) return mlc::Error(line, "Unknown command name");
+	if (!is_command_exist) { 
+		errtrace.push(mlc::Error(line, "Unknown command name"));
+		return errtrace;
+	}
 
-	outcommand = mlc::Command(args, cmdtype);
-	return mlc::Error();
+	//if (cmdtype.arg_count() == args.size()) std::;
+
+	outcommand.push_back(mlc::Command(args, cmdtype));
+	return errtrace;
 }
 
-mlc::Error mlc::extract_operator(const mlc::Line& line, mlc::Operator& outoperator) noexcept
+mlc::Error mlc::extract_operator(const mlc::Line& line, std::string& replaced, std::vector<mlc::Command>& outoperator) noexcept
 {
 	using op = mlc::Operator;
 	using arg_t = typename op::argument_type;
@@ -71,22 +86,23 @@ mlc::Error mlc::extract_operator(const mlc::Line& line, mlc::Operator& outoperat
 		return c != '(' && c != ')' && c != '\"' && c != '\'';
 	};
 
-	auto firstArgStart = std::find_if(strline.begin(), strline.end(), ::isalnum);
-	auto firstArgEnd = std::find_if_not(firstArgStart, strline.end(), ::isalnum);
+	const auto firstArgStart = std::find_if(strline.begin(), strline.end(), ::isalnum);
+	const auto firstArgEnd = std::find_if_not(firstArgStart, strline.end(), ::isalnum);
 
 	if (firstArgStart == strline.end()) return mlc::CriticalError();
 	if (firstArgEnd == strline.end()) return mlc::CriticalError();
 
-	auto operatorNameStart = std::find_if(firstArgStart, strline.end(), 
+	const auto operatorNameStart = std::find_if(firstArgStart, strline.end(), 
 		[&op_name_chars_filter](char c) { return ::ispunct(c) && op_name_chars_filter(c); });
 
-	auto operatorNameEnd = std::find_if(operatorNameStart, strline.end(), 
+	const auto operatorNameEnd = std::find_if(operatorNameStart, strline.end(), 
 		[&op_name_chars_filter](char c) { return !::ispunct(c) || !op_name_chars_filter(c); });
 
 	if (std::distance(operatorNameStart, operatorNameEnd) > op::MAX_NAME_SIZE) return mlc::CriticalError();
+	if (std::find_if_not(firstArgStart, operatorNameStart, op_name_chars_filter) != operatorNameStart) return mlc::CriticalError();
 
-	auto secondArgStart = std::find_if(operatorNameStart, strline.end(), ::isalnum);
-	auto secondArgEnd = std::find_if_not(secondArgStart, strline.end(), ::isalnum);
+	const auto secondArgStart = std::find_if(operatorNameStart, strline.end(), ::isalnum);
+	const auto secondArgEnd = std::find_if_not(secondArgStart, strline.end(), ::isalnum);
 
 	if (secondArgStart == strline.end()) return mlc::CriticalError();
 
@@ -102,9 +118,17 @@ mlc::Error mlc::extract_operator(const mlc::Line& line, mlc::Operator& outoperat
 
 	if (!is_operator_exist) return mlc::Error(line, "Unknown operator name");
 
-	outoperator = mlc::Operator(first, second, optype);
+	auto commands = mlc::Operator(first, second, optype).convert_to_command();
+
+	replaced = commands.first;
+	outoperator.insert(outoperator.begin(), commands.second.begin(), commands.second.end());
 
 	return mlc::Error();
+}
+
+mlc::Error mlc::extract_operator(const mlc::Line& line, std::vector<mlc::Command>& outoperator) noexcept {
+	std::string rep;
+	return mlc::extract_operator(line, rep, outoperator);
 }
 
 void mlc::uncomment_line(mlc::Line& line) noexcept
