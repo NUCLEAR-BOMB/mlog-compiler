@@ -101,11 +101,21 @@ namespace mlc
 		mlc::CommandType("printflush",	1,	-1, {0}),
 		mlc::CommandType("getlink",		2,	0,	{1}),
 		mlc::CommandType("control",		6,	-1, {}),
-		mlc::CommandType("radar",		7,	6,	{}),
-		mlc::CommandType("sensor",		3,	0,	{}),
+		mlc::CommandType("radar",		7,	6,	{0,1,2,3,4,5}),
+		mlc::CommandType("sensor",		3,	0,	{1,2}),
 		mlc::CommandType("set",			2,	0,	{}),
+		mlc::CommandType("op",			4,  1,  {0}),
+		mlc::CommandType("lookup",		3,	1,	{0}),
+		mlc::CommandType("packcolor",	5,	0,	{}),
+		mlc::CommandType("wait",		1,	-1,	{}),
+		mlc::CommandType("stop",		0,	-1,	{}),
+		mlc::CommandType("end",			0,	-1,	{}),
+		mlc::CommandType("jump",		4,	-1,	{0,1}),
+		mlc::CommandType("ubind",		1,	-1,	{0}),
+		mlc::CommandType("ucontrol",	6,	-1,	{0}),
+		mlc::CommandType("uradar",		7,	6,	{0,1,2,3,4,5}),
+		//mlc::CommandType("ulocate",	8,	{4,5,7}, {0,1,2})
 	});
 
 	bool find_command_type(const std::string_view name, mlc::CommandType& type) noexcept;
-
 }
