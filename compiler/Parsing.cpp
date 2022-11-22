@@ -64,29 +64,38 @@ mlc::Error mlc::extract_command(const mlc::Line& line, mlc::Command& outcommand)
 mlc::Error mlc::extract_operator(const mlc::Line& line, mlc::Operator& outoperator) noexcept
 {
 	using op = mlc::Operator;
+	using arg_t = typename op::argument_type;
 	const auto& strline = line.get();
 
-	auto firstArgStart = strline.find_first_not_of(" \t");
-	auto firstArgEnd = strline.find_first_of(" \n", firstArgStart);
+	constexpr auto op_name_chars_filter = [](char c) constexpr {
+		return c != '(' && c != ')' && c != '\"' && c != '\'';
+	};
 
-	if (firstArgEnd == std::string::npos) 
-		return mlc::CriticalError();
+	auto firstArgStart = std::find_if(strline.begin(), strline.end(), ::isalnum);
+	auto firstArgEnd = std::find_if_not(firstArgStart, strline.end(), ::isalnum);
 
-	auto operatorNameStart = strline.find_first_not_of(" \t", firstArgEnd + 1);
-	auto operatorNameEnd = strline.find_first_of(" \t", operatorNameStart + 1);
+	if (firstArgStart == strline.end()) return mlc::CriticalError();
+	if (firstArgEnd == strline.end()) return mlc::CriticalError();
 
-	if (operatorNameStart != operatorNameEnd - 1) 
-		return mlc::CriticalError();
+	auto operatorNameStart = std::find_if(firstArgStart, strline.end(), 
+		[&op_name_chars_filter](char c) { return ::ispunct(c) && op_name_chars_filter(c); });
 
-	auto secondArgStart = strline.find_first_not_of(" \t", operatorNameEnd + 1);
-	auto secondArgEnd = strline.find_first_of(" \t", secondArgStart + 1) - 1;
+	auto operatorNameEnd = std::find_if(operatorNameStart, strline.end(), 
+		[&op_name_chars_filter](char c) { return !::ispunct(c) || !op_name_chars_filter(c); });
+
+	if (std::distance(operatorNameStart, operatorNameEnd) > op::MAX_NAME_SIZE) return mlc::CriticalError();
+
+	auto secondArgStart = std::find_if(operatorNameStart, strline.end(), ::isalnum);
+	auto secondArgEnd = std::find_if_not(secondArgStart, strline.end(), ::isalnum);
+
+	if (secondArgStart == strline.end()) return mlc::CriticalError();
 
 	typename op::name_type opname;
-	typename op::argument_type first, second;
+	arg_t first, second;
 	
-	first = strline.substr(firstArgStart, firstArgEnd - firstArgStart);
-	opname = strline[operatorNameStart];
-	second = strline.substr(secondArgStart, secondArgEnd - secondArgStart);
+	first = arg_t(firstArgStart, firstArgEnd);
+	opname = *operatorNameStart;
+	second = arg_t(secondArgStart, secondArgEnd);
 
 	mlc::OperatorType optype;
 	bool is_operator_exist = mlc::find_operator_type(opname, optype);

@@ -12,6 +12,8 @@ namespace mlc
 		using name_type = char;
 		using converted_type = std::add_pointer_t<mlc::Command(const std::string&, const std::string&)>;
 
+		static constexpr std::size_t MAX_NAME_SIZE = 1;
+
 		OperatorType() noexcept;
 		OperatorType(const name_type& name, converted_type converted = nullptr) noexcept;
 

@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 				errortrace.push(mlc::Error(line, "Using unknown action"));
 			}
 
-			if (!mlc::is_command_variables_valid(varpool, command)) {
+			if (!mlc::is_command_variables_valid(varpool, command) && !mlc::is_creating_var(command)) {
 				//std::cerr << "^^^ Using unknown variable ^^^\n";
 				errortrace.push(mlc::Error(line, "Using unknown variable"));
 			}
