@@ -75,14 +75,15 @@ int main(int argc, char* argv[])
 			mlc::Command command;
 			mlc::Operator op;
 
-			errortrace.clear();
-
 			if (!errortrace.push(mlc::extract_operator(line, op)).critical()) {
 				command = op.convert_to_command();
 			}
 			else
 			if (!errortrace.push(mlc::extract_command(line, command)).critical()) {
 				
+			}
+			else {
+				errortrace.push(mlc::Error(line, "Using unknown action"));
 			}
 
 			if (!mlc::is_command_variables_valid(varpool, command)) {
@@ -105,6 +106,8 @@ int main(int argc, char* argv[])
 				// Print error trace
 				std::cerr << errortrace << '\n';
 				is_compilation_with_error = true;
+
+				errortrace.clear();
 				continue;
 			}
 
