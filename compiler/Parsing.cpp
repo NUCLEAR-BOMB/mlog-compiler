@@ -98,7 +98,7 @@ mlc::Error mlc::extract_operator(const mlc::Line& line, std::string& replaced, s
 	const auto operatorNameEnd = std::find_if(operatorNameStart, strline.end(), 
 		[&op_name_chars_filter](char c) { return !::ispunct(c) || !op_name_chars_filter(c); });
 
-	if (std::distance(operatorNameStart, operatorNameEnd) > op::MAX_NAME_SIZE) return mlc::CriticalError();
+	if (static_cast<std::size_t>(std::distance(operatorNameStart, operatorNameEnd)) > op::MAX_NAME_SIZE) return mlc::CriticalError();
 	if (std::find_if_not(firstArgStart, operatorNameStart, op_name_chars_filter) != operatorNameStart) return mlc::CriticalError();
 
 	const auto secondArgStart = std::find_if(operatorNameStart, strline.end(), ::isalnum);
