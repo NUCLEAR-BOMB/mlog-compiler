@@ -3,6 +3,8 @@
 #include <sstream>
 #include <iostream>
 #include <regex>
+#include <cctype>
+#include <iterator>
 
 mlc::ErrorTrace mlc::extract_command(const mlc::Line& line, std::vector<mlc::Command>& outcommand) noexcept
 {
@@ -82,46 +84,53 @@ mlc::Error mlc::extract_operator(const mlc::Line& line, std::string& replaced, s
 	using arg_t = typename op::argument_type;
 	const auto& strline = line.get();
 
-	constexpr auto op_name_chars_filter = [](char c) constexpr {
-		return c != '(' && c != ')' && c != '\"' && c != '\'';
+	if (strline.find_first_of("()") != std::string::npos) return mlc::CriticalError();
+
+	constexpr auto arg_filter = [](unsigned char c) -> bool {
+		return std::isalnum(c) || c == '_' || c == '\"' || c == '\'';
 	};
 
-	const auto firstArgStart = std::find_if(strline.begin(), strline.end(), ::isalnum);
-	const auto firstArgEnd = std::find_if_not(firstArgStart, strline.end(), ::isalnum);
+	constexpr auto operator_filter = [](unsigned char c) -> bool {
+		return mlc::OPERATOR_LIST.find(c) != mlc::OPERATOR_LIST.end();
+	};
 
-	if (firstArgStart == strline.end()) return mlc::CriticalError();
-	if (firstArgEnd == strline.end()) return mlc::CriticalError();
+	const auto firstArgStart = std::find_if(strline.begin(), strline.end(), arg_filter);
 
-	const auto operatorNameStart = std::find_if(firstArgStart, strline.end(), 
-		[&op_name_chars_filter](char c) { return ::ispunct(c) && op_name_chars_filter(c); });
+	const auto operatorNameStart = std::find_if(firstArgStart, strline.end(), operator_filter);
+	const auto operatorNameEnd = std::find_if_not(operatorNameStart, strline.end(), operator_filter);
 
-	const auto operatorNameEnd = std::find_if(operatorNameStart, strline.end(), 
-		[&op_name_chars_filter](char c) { return !::ispunct(c) || !op_name_chars_filter(c); });
+	const auto firstArgEnd = std::find_if(
+		std::make_reverse_iterator(operatorNameStart), std::make_reverse_iterator(firstArgStart), arg_filter
+	).base();
 
-	if (static_cast<std::size_t>(std::distance(operatorNameStart, operatorNameEnd)) > op::MAX_NAME_SIZE) return mlc::CriticalError();
-	if (std::find_if_not(firstArgStart, operatorNameStart, op_name_chars_filter) != operatorNameStart) return mlc::CriticalError();
+	const auto secondArgStart = std::find_if(operatorNameEnd, strline.end(), arg_filter);
+	const auto secondArgEnd = std::find_if(strline.rbegin(), std::make_reverse_iterator(secondArgStart), arg_filter).base();
 
-	const auto secondArgStart = std::find_if(operatorNameStart, strline.end(), ::isalnum);
-	const auto secondArgEnd = std::find_if_not(secondArgStart, strline.end(), ::isalnum);
+	if (static_cast<std::size_t>(std::distance(operatorNameStart, operatorNameEnd)) > mlc::OperatorType::MAX_NAME_SIZE || operatorNameStart == strline.end() || operatorNameEnd == strline.end()) return mlc::CriticalError();
+	if (firstArgStart	  == strline.end() || firstArgEnd	  == strline.end()) return mlc::CriticalError();
+	if (secondArgStart	  == strline.end()) return mlc::CriticalError();
 
-	if (secondArgStart == strline.end()) return mlc::CriticalError();
-
-	typename op::name_type opname;
-	arg_t first, second;
-	
-	first = arg_t(firstArgStart, firstArgEnd);
-	opname = *operatorNameStart;
-	second = arg_t(secondArgStart, secondArgEnd);
+	const arg_t					 first = arg_t(firstArgStart, firstArgEnd);
+	const typename op::name_type opname = *operatorNameStart;
+	const arg_t					 second = arg_t(secondArgStart, secondArgEnd);
 
 	mlc::OperatorType optype;
 	bool is_operator_exist = mlc::find_operator_type(opname, optype);
 
 	if (!is_operator_exist) return mlc::Error(line, "Unknown operator name");
 
-	auto commands = mlc::Operator(first, second, optype).convert_to_command();
+	std::string replace_second;
+	if (!mlc::extract_operator(mlc::Line(second, line), replace_second, outoperator).critical()) {
+		
+	}
+	else {
+		replace_second = second;
+	}
+
+	auto commands = std::move(mlc::Operator(first, replace_second, optype).convert_to_command());
 
 	replaced = commands.first;
-	outoperator.insert(outoperator.begin(), commands.second.begin(), commands.second.end());
+	outoperator.insert(outoperator.end(), commands.second.begin(), commands.second.end());
 
 	return mlc::Error();
 }
