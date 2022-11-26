@@ -127,7 +127,7 @@ mlc::Error mlc::extract_operator(const mlc::Line& line, std::wstring& replaced, 
 		replace_second = second;
 	}
 
-	auto commands = std::move(mlc::Operator(first, replace_second, optype).convert_to_command());
+	auto commands = mlc::Operator(first, replace_second, optype).convert_to_command();
 
 	replaced = commands.first;
 	outoperator.insert(outoperator.end(), commands.second.begin(), commands.second.end());
