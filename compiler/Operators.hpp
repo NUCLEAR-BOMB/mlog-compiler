@@ -52,10 +52,10 @@ namespace mlc
 
 	const std::set<OperatorType> OPERATOR_LIST({
 		OperatorType('=', [](auto first, auto second) -> Operator::converted_result_type 
-			{ return {first, {mlc::Command("set", { first, second }, 0)}}; }),
+			{ return {first, {mlc::make_command("set", { first, second })}}; }),
 
 		OperatorType('+', [](auto first, auto second) -> Operator::converted_result_type
-			{ return {"TEMP", {mlc::Command("op", { "add", "TEMP", first, second}, 1)}}; }),
+			{ return {"TEMP", {mlc::make_command("op", { "add", "TEMP", first, second})}}; }),
 		//OperatorType('+', [](auto first, auto second) { return mlc::Command("op", {}, 0); }),
 	});
 

@@ -122,4 +122,6 @@ namespace mlc
 	});
 
 	bool find_command_type(const std::string_view name, mlc::CommandType& type) noexcept;
+
+	mlc::Command make_command(const std::string_view name, const typename Command::args_type& args);
 }

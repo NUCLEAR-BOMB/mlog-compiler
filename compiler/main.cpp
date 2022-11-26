@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
 
 			for (const auto& command : commandarr)
 			{
-				if (!mlc::is_command_variables_valid(varpool, command) && !mlc::is_creating_var(command)) {
+				if (!mlc::is_command_variables_valid(varpool, command)) {
 					//std::cerr << "^^^ Using unknown variable ^^^\n";
 					errortrace.push(mlc::Error(line, "Using unknown variable"));
 				}

@@ -1,6 +1,7 @@
 #include "Commands.hpp"
 
 #include <iostream>
+#include <stdexcept>
 
 mlc::Command::Command(const CommandType& type) noexcept
     : m_args(), Base(type)
@@ -113,4 +114,11 @@ bool mlc::find_command_type(const std::string_view name, mlc::CommandType& type)
         return true;
     }
     return false;
+}
+
+mlc::Command mlc::make_command(const std::string_view name, const typename Command::args_type& args)
+{
+    mlc::CommandType cmd;
+    if (!mlc::find_command_type(name, cmd)) throw std::logic_error("Unknown name");
+    return mlc::Command(args, cmd);
 }
