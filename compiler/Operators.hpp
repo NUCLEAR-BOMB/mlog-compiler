@@ -9,9 +9,9 @@ namespace mlc
 	class OperatorType
 	{
 	public:
-		using name_type = char;
-		using converted_result_type = std::pair<std::string, std::vector<mlc::Command>>;
-		using converted_type = std::add_pointer_t<converted_result_type(const std::string&, const std::string&)>;
+		using name_type = wchar_t;
+		using converted_result_type = std::pair<std::wstring, std::vector<mlc::Command>>;
+		using converted_type = std::add_pointer_t<converted_result_type(const std::wstring&, const std::wstring&)>;
 
 		static constexpr std::size_t MAX_NAME_SIZE = 1;
 
@@ -33,7 +33,7 @@ namespace mlc
 		using Base = OperatorType;
 	public:
 		using name_type = typename Base::name_type;
-		using argument_type = std::string;
+		using argument_type = std::wstring;
 		using converted_type = typename Base::converted_type;
 
 		Operator() noexcept;
@@ -52,10 +52,10 @@ namespace mlc
 
 	const std::set<OperatorType> OPERATOR_LIST({
 		OperatorType('=', [](auto first, auto second) -> Operator::converted_result_type 
-			{ return {first, {mlc::make_command("set", { first, second })}}; }),
+			{ return {first, {mlc::make_command(L"set", { first, second })}}; }),
 
 		OperatorType('+', [](auto first, auto second) -> Operator::converted_result_type
-			{ return {"TEMP", {mlc::make_command("op", { "add", "TEMP", first, second})}}; }),
+			{ return {L"TEMP", {mlc::make_command(L"op", { L"add", L"TEMP", first, second})}}; }),
 		//OperatorType('+', [](auto first, auto second) { return mlc::Command("op", {}, 0); }),
 	});
 

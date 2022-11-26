@@ -24,7 +24,7 @@ mlc::Operator::Base::converted_result_type mlc::Operator::convert_to_command() c
 }
 
 mlc::OperatorType::OperatorType() noexcept
-	: m_name(-123), m_converted(nullptr)
+	: m_name(static_cast<wchar_t>(-123)), m_converted(nullptr)
 {}
 
 mlc::OperatorType::OperatorType(const name_type& name, converted_type converted) noexcept

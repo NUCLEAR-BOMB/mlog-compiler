@@ -10,7 +10,7 @@
 
 namespace mlc
 {
-	using raw_mlog_command_type = std::string;
+	using raw_mlog_command_type = std::wstring;
 
 	class Command;
 
@@ -28,7 +28,7 @@ namespace mlc
 
 		// Main constructor
 		CommandType(
-			const std::string_view command, 
+			const std::wstring_view command, 
 			arguments_count_type arguments_count = ~std::size_t(0), 
 			out_arg_type out_arg_				 = NO_OUT_ARG, 
 			const ignore_args_type& ignore_args	 = ignore_args_type()
@@ -39,7 +39,7 @@ namespace mlc
 		// Implicit convertion from mlc::Command
 		CommandType(const Command& cmd) noexcept;
 
-		const std::string& name() const& noexcept;
+		const std::wstring& name() const& noexcept;
 		arguments_count_type arg_count() const noexcept;
 		out_arg_type out_arg_index() const noexcept;
 		const ignore_args_type& ignore_args() const noexcept;
@@ -49,7 +49,7 @@ namespace mlc
 		bool operator<(const CommandType& right) const noexcept;
 
 	protected:
-		std::string			 m_command;
+		std::wstring			 m_command;
 		arguments_count_type m_arguments_count;
 		out_arg_type		 m_out_arg;
 		ignore_args_type	 m_ignore_args;
@@ -59,17 +59,17 @@ namespace mlc
 	{
 		using Base = CommandType;
 
-		//friend bool extract_command(std::string&, mlc::Command&) noexcept;
+		//friend bool extract_command(std::wstring&, mlc::Command&) noexcept;
 
 		Command(const CommandType& type) noexcept;
 	public:
-		using args_type = std::vector<std::string>;
-		using argument_type = std::string;
+		using args_type = std::vector<std::wstring>;
+		using argument_type = std::wstring;
 		using arguments_count_type = typename Base::arguments_count_type;
 		using out_arg_type = typename Base::out_arg_type;
 
 		Command() noexcept;
-		Command(const std::string& command, const args_type& args, out_arg_type out_arg_index = Base::NO_OUT_ARG) noexcept;
+		Command(const std::wstring& command, const args_type& args, out_arg_type out_arg_index = Base::NO_OUT_ARG) noexcept;
 		Command(const args_type& args, const CommandType& cmdtype) noexcept;
 
 		const args_type& args() const noexcept;
@@ -92,36 +92,36 @@ namespace mlc
 	// Check if the command type creating variable
 	bool is_creating_var(const mlc::CommandType& cmdtype) noexcept;
 
-	std::string create_temp_variable_name(mlc::Line::line_counter_type l) noexcept;
+	std::wstring create_temp_variable_name(mlc::Line::line_counter_type l) noexcept;
 
 	// Table of some mlog commands
 	const std::set<mlc::CommandType> COMMAND_LIST({
 		//				 <name>	<arg count> <out arg> <ignored args>
-		mlc::CommandType("read",		3,	0,	{}),
-		mlc::CommandType("write",		3,	-1, {}),
-		mlc::CommandType("draw",		7,	-1, {0}),
-		mlc::CommandType("print",		1,	-1, {}),
-		mlc::CommandType("drawflush",	1,	-1, {0}),
-		mlc::CommandType("printflush",	1,	-1, {0}),
-		mlc::CommandType("getlink",		2,	0,	{1}),
-		mlc::CommandType("control",		6,	-1, {}),
-		mlc::CommandType("radar",		7,	6,	{0,1,2,3,4,5}),
-		mlc::CommandType("sensor",		3,	0,	{1,2}),
-		mlc::CommandType("set",			2,	0,	{}),
-		mlc::CommandType("op",			4,  1,  {0}),
-		mlc::CommandType("lookup",		3,	1,	{0}),
-		mlc::CommandType("packcolor",	5,	0,	{}),
-		mlc::CommandType("wait",		1,	-1,	{}),
-		mlc::CommandType("stop",		0,	-1,	{}),
-		mlc::CommandType("end",			0,	-1,	{}),
-		mlc::CommandType("jump",		4,	-1,	{0,1}),
-		mlc::CommandType("ubind",		1,	-1,	{0}),
-		mlc::CommandType("ucontrol",	6,	-1,	{0}),
-		mlc::CommandType("uradar",		7,	6,	{0,1,2,3,4,5}),
+		mlc::CommandType(L"read",		3,	0,	{}),
+		mlc::CommandType(L"write",		3,	-1, {}),
+		mlc::CommandType(L"draw",		7,	-1, {0}),
+		mlc::CommandType(L"print",		1,	-1, {}),
+		mlc::CommandType(L"drawflush",	1,	-1, {0}),
+		mlc::CommandType(L"printflush",	1,	-1, {0}),
+		mlc::CommandType(L"getlink",		2,	0,	{1}),
+		mlc::CommandType(L"control",		6,	-1, {}),
+		mlc::CommandType(L"radar",		7,	6,	{0,1,2,3,4,5}),
+		mlc::CommandType(L"sensor",		3,	0,	{1,2}),
+		mlc::CommandType(L"set",			2,	0,	{}),
+		mlc::CommandType(L"op",			4,  1,  {0}),
+		mlc::CommandType(L"lookup",		3,	1,	{0}),
+		mlc::CommandType(L"packcolor",	5,	0,	{}),
+		mlc::CommandType(L"wait",		1,	-1,	{}),
+		mlc::CommandType(L"stop",		0,	-1,	{}),
+		mlc::CommandType(L"end",			0,	-1,	{}),
+		mlc::CommandType(L"jump",		4,	-1,	{0,1}),
+		mlc::CommandType(L"ubind",		1,	-1,	{0}),
+		mlc::CommandType(L"ucontrol",	6,	-1,	{0}),
+		mlc::CommandType(L"uradar",		7,	6,	{0,1,2,3,4,5}),
 		//mlc::CommandType("ulocate",	8,	{4,5,7}, {0,1,2})
 	});
 
-	bool find_command_type(const std::string_view name, mlc::CommandType& type) noexcept;
+	bool find_command_type(const std::wstring_view name, mlc::CommandType& type) noexcept;
 
-	mlc::Command make_command(const std::string_view name, const typename Command::args_type& args);
+	mlc::Command make_command(const std::wstring_view name, const typename Command::args_type& args);
 }

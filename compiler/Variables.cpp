@@ -22,15 +22,15 @@ bool mlc::VariablesPool::contains(const mlc::Variable& var) const noexcept {
 	return m_pool.find(var) != m_pool.cend();
 }
 
-mlc::Variable::Variable(const std::string_view name) noexcept
+mlc::Variable::Variable(const std::wstring_view name) noexcept
 	: m_name(name)
 {}
 
-mlc::Variable::Variable(const std::string& name) noexcept
+mlc::Variable::Variable(const std::wstring& name) noexcept
 	: m_name(name)
 {}
 
-const std::string& mlc::Variable::name() const noexcept {
+const std::wstring& mlc::Variable::name() const noexcept {
 	return m_name;
 }
 
@@ -39,8 +39,8 @@ bool mlc::Variable::operator<(const Variable& right) const noexcept {
 }
 
 bool mlc::is_variable_valid(const mlc::Variable& var) noexcept {
-	//std::string varname = std::regex_replace(cmd[0], std::regex("^ +| +$"), "");
-	const std::string_view varname = var.name();
+	//std::wstring varname = std::regex_replace(cmd[0], std::regex("^ +| +$"), "");
+	const std::wstring_view varname = var.name();
 
 	bool only_digits = std::all_of(varname.begin(), varname.end(), ::isdigit);
 

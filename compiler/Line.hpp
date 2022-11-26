@@ -9,7 +9,7 @@ namespace mlc
 	{
 	public:
 
-		using value_type = std::string;
+		using value_type = std::wstring;
 		using line_counter_type = std::size_t;
 
 		operator value_type&() & noexcept;
@@ -17,8 +17,8 @@ namespace mlc
 		//operator value_type() && noexcept;
 
 		Line() noexcept;
-		Line(const std::string_view data, line_counter_type counter) noexcept;
-		Line(const std::string_view data, const Line& other) noexcept;
+		Line(const std::wstring_view data, line_counter_type counter) noexcept;
+		Line(const std::wstring_view data, const Line& other) noexcept;
 
 		// Get string from line
 		value_type& get() noexcept;

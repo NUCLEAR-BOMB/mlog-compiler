@@ -10,16 +10,16 @@ namespace mlc
 	{
 	public:
 
-		Variable(const std::string_view name) noexcept;
-		Variable(const std::string& name) noexcept;
+		Variable(const std::wstring_view name) noexcept;
+		Variable(const std::wstring& name) noexcept;
 
-		const std::string& name() const noexcept;
+		const std::wstring& name() const noexcept;
 
 		// For std::set
 		bool operator<(const Variable& right) const noexcept;
 
 	private:
-		const std::string m_name;
+		const std::wstring m_name;
 	};
 
 	class VariablesPool

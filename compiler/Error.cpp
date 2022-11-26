@@ -3,16 +3,16 @@
 #include <sstream>
 #include <algorithm>
 
-mlc::Error::Error(const mlc::Line& line, const std::string_view message) noexcept 
+mlc::Error::Error(const mlc::Line& line, const std::wstring_view message) noexcept 
 	: m_critical(false) {
-	std::stringstream ss;
+	std::wstringstream ss;
 	ss << "Line " << line.line() << " [Error] | " << line.get() << " \\ " << message;
 	m_str = ss.str();
 }
 
 mlc::Error::Error(const mlc::Line& line) noexcept
 	: m_critical(false) {
-	std::stringstream ss;
+	std::wstringstream ss;
 	ss << "Line " << line.line() << " [Error] | " << line.get();
 	m_str = ss.str();
 }
@@ -33,7 +33,7 @@ bool mlc::Error::empty() const noexcept {
 	return m_critical || m_str.empty();
 }
 
-const std::string& mlc::Error::str() const noexcept {
+const std::wstring& mlc::Error::str() const noexcept {
 	return m_str;
 }
 
@@ -45,7 +45,7 @@ bool mlc::Error::critical() const noexcept {
 	return m_critical;
 }
 
-std::ostream& mlc::operator<<(std::ostream& os, const Error& err) noexcept {
+std::wostream& mlc::operator<<(std::wostream& os, const Error& err) noexcept {
 	os << err.m_str;
 	return os;
 }

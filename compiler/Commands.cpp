@@ -10,7 +10,7 @@ mlc::Command::Command(const CommandType& type) noexcept
 mlc::Command::Command() noexcept
 {}
 
-mlc::Command::Command(const std::string& command, const args_type& args, out_arg_type out_arg_index) noexcept
+mlc::Command::Command(const std::wstring& command, const args_type& args, out_arg_type out_arg_index) noexcept
     : m_args(args), Base(command, args.size(), out_arg_index) {}
 
 mlc::Command::Command(const args_type& args, const CommandType& cmdtype) noexcept
@@ -35,7 +35,7 @@ mlc::raw_mlog_command_type mlc::Command::convert() const noexcept
 
     raw_mlog_command_type out = m_command;
     for (const auto& s : m_args) {
-        out += " "s;
+        out += L" "s;
         out += s;
     }
     return out;
@@ -54,7 +54,7 @@ mlc::CommandType::CommandType() noexcept
 {}
 
 mlc::CommandType::CommandType(
-    const std::string_view command,
+    const std::wstring_view command,
     arguments_count_type arguments_count, 
     out_arg_type out_arg_, 
     const ignore_args_type& ignore_args
@@ -70,7 +70,7 @@ mlc::CommandType::CommandType(const Command& cmd) noexcept
     : m_command(cmd.name()), m_arguments_count(cmd.arg_count())
 {}
 
-const std::string& mlc::CommandType::name() const& noexcept {
+const std::wstring& mlc::CommandType::name() const& noexcept {
     return m_command;
 }
 
@@ -98,12 +98,12 @@ bool mlc::is_creating_var(const mlc::CommandType& cmdtype) noexcept {
     return cmdtype.out_arg_index() >= 0;
 }
 
-std::string mlc::create_temp_variable_name(mlc::Line::line_counter_type l) noexcept {
+std::wstring mlc::create_temp_variable_name(mlc::Line::line_counter_type l) noexcept {
     using namespace std::string_literals;
-    return "__TEMP_"s + std::to_string(l) + "__"s;
+    return L"__TEMP_"s + std::to_wstring(l) + L"__"s;
 }
 
-bool mlc::find_command_type(const std::string_view name, mlc::CommandType& type) noexcept
+bool mlc::find_command_type(const std::wstring_view name, mlc::CommandType& type) noexcept
 {
     // check if COMMAND_LIST contains command.type() 
     //auto t = mlc::COMMAND_LIST.find(mlc::CommandType(cmdname));
@@ -116,7 +116,7 @@ bool mlc::find_command_type(const std::string_view name, mlc::CommandType& type)
     return false;
 }
 
-mlc::Command mlc::make_command(const std::string_view name, const typename Command::args_type& args)
+mlc::Command mlc::make_command(const std::wstring_view name, const typename Command::args_type& args)
 {
     mlc::CommandType cmd;
     if (!mlc::find_command_type(name, cmd)) throw std::logic_error("Unknown name");

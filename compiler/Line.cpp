@@ -12,11 +12,11 @@ mlc::Line::Line() noexcept
 	: m_data(), m_counter(0)
 {}
 
-mlc::Line::Line(const std::string_view data, line_counter_type counter) noexcept
+mlc::Line::Line(const std::wstring_view data, line_counter_type counter) noexcept
 	: m_data(data), m_counter(counter)
 {}
 
-mlc::Line::Line(const std::string_view data, const Line& other) noexcept
+mlc::Line::Line(const std::wstring_view data, const Line& other) noexcept
 	: m_data(data), m_counter(other.m_counter)
 {}
 

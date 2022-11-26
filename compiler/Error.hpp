@@ -14,19 +14,19 @@ namespace mlc
 	{
 	public:
 
-		Error(const mlc::Line& line, const std::string_view message) noexcept;
+		Error(const mlc::Line& line, const std::wstring_view message) noexcept;
 		Error(const mlc::Line& line) noexcept;
 		Error(const CriticalError& critical) noexcept;
 		Error() noexcept;
 
 		// Print error
-		friend std::ostream& operator<<(std::ostream& os, const Error& err) noexcept;
+		friend std::wostream& operator<<(std::wostream& os, const Error& err) noexcept;
 
 		// If this an error empty
 		operator bool() const noexcept;
 		bool empty() const noexcept;
 
-		const std::string& str() const noexcept;
+		const std::wstring& str() const noexcept;
 		// Make an error empty
 		void clear() noexcept;
 
@@ -34,10 +34,10 @@ namespace mlc
 		bool critical() const noexcept;
 
 	private:
-		std::string m_str;
+		std::wstring m_str;
 		bool m_critical;
 	};
-	std::ostream& operator<<(std::ostream& os, const Error& err) noexcept;
+	std::wostream& operator<<(std::wostream& os, const Error& err) noexcept;
 
 	class ErrorTrace
 	{
