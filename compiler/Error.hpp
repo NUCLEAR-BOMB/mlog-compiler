@@ -73,11 +73,11 @@ namespace mlc
 		void clear() noexcept;
 
 		// Print errors
-		friend std::ostream& operator<<(std::ostream& os, const ErrorTrace& errtrace) noexcept;
+		friend std::wostream& operator<<(std::wostream& os, const ErrorTrace& errtrace) noexcept;
 
 	private:
 		container_type m_trace;
 	};
-	std::ostream& operator<<(std::ostream& os, const ErrorTrace& errtrace) noexcept;
+	std::wostream& operator<<(std::wostream& os, const ErrorTrace& errtrace) noexcept;
 }
 

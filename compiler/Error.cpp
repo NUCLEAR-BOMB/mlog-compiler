@@ -50,7 +50,7 @@ std::wostream& mlc::operator<<(std::wostream& os, const Error& err) noexcept {
 	return os;
 }
 
-std::ostream& mlc::operator<<(std::ostream& os, const ErrorTrace& errtrace) noexcept 
+std::wostream& mlc::operator<<(std::wostream& os, const ErrorTrace& errtrace) noexcept 
 {
 	if (errtrace.empty()) return os;
 
