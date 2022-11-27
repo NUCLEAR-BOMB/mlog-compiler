@@ -106,13 +106,16 @@ int main(int argc, char* argv[])
 				}
 
 				if (mlc::is_creating_var(command)) {
-					if (varpool.add(command.out_arg())) {
-						//std::wcout << "Adding var\n";
-					}
-					else {
-						//std::wcerr << "^^^ Invalid variable ^^^\n";
-						errortrace.push(mlc::Error(line, L"Invalid variable name"));
-						//compilation_error(line);
+					for (const auto& i : command.out_arg_index())
+					{
+						if (varpool.add(command.args()[i])) {
+							//std::wcout << "Adding var\n";
+						}
+						else {
+							//std::wcerr << "^^^ Invalid variable ^^^\n";
+							errortrace.push(mlc::Error(line, L"Invalid variable name"));
+							//compilation_error(line);
+						}
 					}
 				}
 

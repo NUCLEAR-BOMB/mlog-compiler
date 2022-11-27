@@ -22,11 +22,7 @@ const mlc::Command::args_type& mlc::Command::args() const noexcept {
 }
 
 mlc::CommandType mlc::Command::type() const noexcept {
-    return CommandType(m_command, Base::arg_count(), 0);
-}
-
-const mlc::Command::argument_type& mlc::Command::out_arg() const noexcept {
-    return m_args.at(Base::out_arg_index());
+    return CommandType(m_command, Base::arg_count());
 }
 
 mlc::raw_mlog_command_type mlc::Command::convert() const noexcept
@@ -50,7 +46,7 @@ const mlc::Command::argument_type& mlc::Command::operator[](std::size_t index) c
 }
 
 mlc::CommandType::CommandType() noexcept
-    : m_command(), m_arguments_count(123456789), m_out_arg(-1234567)
+    : m_command(), m_arguments_count(123456789), m_out_arg(1234567)
 {}
 
 mlc::CommandType::CommandType(
@@ -62,9 +58,9 @@ mlc::CommandType::CommandType(
     : m_command(command)
     , m_arguments_count(arguments_count)
     , m_out_arg(out_arg_)
-    , m_ignore_args(ignore_args) {
-
-}
+    , m_ignore_args(ignore_args)
+    , m_has_out_args(!out_arg_.empty())
+{}
 
 mlc::CommandType::CommandType(const Command& cmd) noexcept
     : m_command(cmd.name()), m_arguments_count(cmd.arg_count())
@@ -86,6 +82,10 @@ const mlc::CommandType::ignore_args_type& mlc::CommandType::ignore_args() const 
     return m_ignore_args;
 }
 
+bool mlc::CommandType::has_out_args() const noexcept {
+    return m_has_out_args;
+}
+
 bool mlc::CommandType::operator==(const CommandType& right) const noexcept {
     return name() == right.name() && m_arguments_count == right.m_arguments_count;
 }
@@ -95,7 +95,7 @@ bool mlc::CommandType::operator<(const CommandType& right) const noexcept {
 }
 
 bool mlc::is_creating_var(const mlc::CommandType& cmdtype) noexcept {
-    return cmdtype.out_arg_index() >= 0;
+    return cmdtype.has_out_args();
 }
 
 std::wstring mlc::create_temp_variable_name(mlc::Line::line_counter_type l) noexcept {

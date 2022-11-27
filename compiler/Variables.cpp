@@ -54,10 +54,12 @@ bool mlc::is_command_variables_valid(const VariablesPool& pool, const mlc::Comma
 {
 	const auto& args = cmd.args();
 	const auto& ignore_args = cmd.ignore_args();
+	const auto& out_arg_index = cmd.out_arg_index();
+
 	for (std::size_t i = 0; i < args.size(); ++i)
 	{
 		// Skip out arg
-		if (mlc::is_creating_var(cmd) && i == static_cast<std::size_t>(cmd.out_arg_index())) continue;
+		if (mlc::is_creating_var(cmd) && std::find(out_arg_index.begin(), out_arg_index.end(), i) != out_arg_index.end()) continue;
 		// Skip ignored args
 		if (std::find(ignore_args.cbegin(), ignore_args.cend(), i) != ignore_args.cend()) continue;
 
